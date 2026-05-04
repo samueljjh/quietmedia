@@ -22,11 +22,13 @@
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
 }
-.scroll-left { animation: scrollLeft 40s linear infinite; display: flex; width: max-content; }
-.scroll-right { animation: scrollRight 40s linear infinite; display: flex; width: max-content; }
+.scroll-left { animation: scrollLeft 50s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-right { animation: scrollRight 60s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-logo { animation: scrollLeft 35s linear infinite; display: flex; align-items: center; width: max-content; }
 .client-strip { overflow: hidden; width: 100%; }
 .client-strip:hover .scroll-left,
-.client-strip:hover .scroll-right { animation-play-state: paused; }
+.client-strip:hover .scroll-right,
+.client-strip:hover .scroll-logo { animation-play-state: paused; }
 </style>
 </head>
 <body>
@@ -37,10 +39,8 @@ const QMark = ({ size = 22, color = 'var(--fg-primary)', style = {} }) => {
   const px = typeof size === 'number' ? `${size}px` : size;
   return (
     <div style={{
-      width: px, height: px,
-      background: color,
-      maskImage: 'url(assets/logo.svg)',
-      WebkitMaskImage: 'url(assets/logo.svg)',
+      width: px, height: px, background: color,
+      maskImage: 'url(assets/logo.svg)', WebkitMaskImage: 'url(assets/logo.svg)',
       maskSize: 'contain', WebkitMaskSize: 'contain',
       maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
       maskPosition: 'center', WebkitMaskPosition: 'center',
@@ -135,47 +135,174 @@ const HeroSection = ({ onBook }) => {
   );
 };
 
-// ─── Client Strip ─────────────────────────────────────────────
-const ClientStrip = () => {
-  const brands = ['Paramount+', 'Amazon Prime', 'John Lewis', 'Tesco', 'M&S', 'Dreams', 'Optical Express', 'F&F', 'Pep & Co', 'Sophie Conran', 'Six Senses', 'Crowcon', 'Aream & Co', 'International Collective', 'David Michael Productions', 'Agency 105'];
-  const talent = ['Diversity', 'Ashley Banjo', 'Junior Eurovision', 'Queenz', "Frankie's Guys", 'Chiswick Cinema', 'Move It', 'Horizon', 'Louise Dearman', 'Kele Le Roc', 'MAZZA', 'Zoe Birkett', 'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning', 'Chris Manoe', 'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle', 'UP Clothing', 'Wilkes Academy', 'Performers College', 'LIPA', 'The Hammond', 'Shockout Arts', 'McLaren Dance Company', 'Tap Attack', 'Diverse Dubai'];
+// ─── Client Strips ────────────────────────────────────────────
+const ClientStrips = () => {
 
-  const itemStyle = {
-    fontSize: '11px', fontWeight: 500, letterSpacing: '0.18em',
-    textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)',
-    whiteSpace: 'nowrap', padding: '0 32px',
-    transition: 'color 0.2s', cursor: 'default',
+  const logoClients = [
+    { name: 'PARAMOUNT+', style: { fontSize: '15px', fontWeight: 600, letterSpacing: '0.05em' } },
+    { name: 'AMAZON PRIME', style: { fontSize: '13px', fontWeight: 500, letterSpacing: '0.08em' } },
+    { name: 'JOHN LEWIS', style: { fontSize: '13px', fontWeight: 400, letterSpacing: '0.12em' } },
+    { name: 'TESCO', style: { fontSize: '16px', fontWeight: 700, letterSpacing: '0.06em' } },
+    { name: 'M&S', style: { fontSize: '16px', fontWeight: 700, letterSpacing: '0.08em' } },
+    { name: 'DREAMS', style: { fontSize: '15px', fontWeight: 600, letterSpacing: '0.1em' } },
+    { name: 'SOPHIE CONRAN', style: { fontSize: '12px', fontWeight: 300, letterSpacing: '0.18em' } },
+    { name: 'PEP & CO', style: { fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em' } },
+    { name: 'DIVERSITY', style: { fontSize: '14px', fontWeight: 700, letterSpacing: '0.12em' } },
+    { name: 'ASHLEY BANJO', style: { fontSize: '13px', fontWeight: 400, letterSpacing: '0.1em' } },
+    { name: 'JUNIOR EUROVISION', style: { fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em' } },
+    { name: 'MOVE IT', style: { fontSize: '15px', fontWeight: 700, letterSpacing: '0.06em' } },
+    { name: 'INTERNATIONAL COLLECTIVE', style: { fontSize: '10px', fontWeight: 500, letterSpacing: '0.15em' } },
+    { name: 'SIX SENSES', style: { fontSize: '13px', fontWeight: 300, letterSpacing: '0.22em' } },
+    { name: 'AREAM & CO', style: { fontSize: '13px', fontWeight: 500, letterSpacing: '0.12em' } },
+  ];
+
+  const brandClients = [
+    'Tesco', 'M&S', 'John Lewis', 'Dreams', 'Optical Express', 'F&F', 'Pep & Co',
+    'Sophie Conran', 'Six Senses', 'Crowcon', 'Aream & Co', 'International Collective',
+    'David Michael Productions', 'Agency 105', 'Chiswick Cinema', 'Horizon',
+  ];
+
+  const talentClients = [
+    'Diversity', 'Ashley Banjo', 'Junior Eurovision', 'Queenz', "Frankie's Guys",
+    'Move It', 'Louise Dearman', 'Kele Le Roc', 'MAZZA', 'Zoe Birkett',
+    'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning', 'Chris Manoe',
+    'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle', 'UP Clothing',
+    'Wilkes Academy', 'Performers College', 'The Hammond', 'Shockout Arts',
+    'McLaren Dance Company', 'Tap Attack', 'Diverse Dubai',
+  ];
+
+  const Dot = () => (
+    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.12)', flexShrink: 0, margin: '0 28px' }} />
+  );
+
+  const LogoItem = ({ client }) => {
+    const [hovered, setHovered] = React.useState(false);
+    return (
+      <span
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          ...client.style,
+          color: hovered ? 'rgba(var(--fg-rgb),0.9)' : 'rgba(var(--fg-rgb),0.22)',
+          transition: 'color 0.3s ease',
+          whiteSpace: 'nowrap',
+          padding: '0 36px',
+          cursor: 'default',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >{client.name}</span>
+    );
   };
 
-  const Divider = () => <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.12)', flexShrink: 0, alignSelf: 'center' }} />;
-
-  const renderItems = (items) => items.map((name, i) => (
-    <React.Fragment key={i}>
-      <span style={itemStyle}
-        onMouseEnter={e => e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.7)'}
-        onMouseLeave={e => e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.28)'}
-      >{name}</span>
-      <Divider />
-    </React.Fragment>
-  ));
+  const TextItem = ({ name }) => {
+    const [hovered, setHovered] = React.useState(false);
+    return (
+      <>
+        <span
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          style={{
+            fontSize: '10px', fontWeight: 500, letterSpacing: '0.2em',
+            textTransform: 'uppercase', whiteSpace: 'nowrap',
+            color: hovered ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.25)',
+            transition: 'color 0.25s ease', cursor: 'default',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >{name}</span>
+        <Dot />
+      </>
+    );
+  };
 
   return (
-    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0', overflow: 'hidden' }}>
-      <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.04)', padding: '20px 0' }}>
+    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)' }}>
+
+      {/* Label */}
+      <div style={{ padding: '20px clamp(24px,5vw,80px) 0', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.18)', whiteSpace: 'nowrap' }}>TRUSTED BY</span>
+        <div style={{ height: '1px', background: 'rgba(var(--fg-rgb),0.06)', flex: 1 }} />
+      </div>
+
+      {/* Strip 1 — Featured logos */}
+      <div style={{ padding: '24px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
         <div className="client-strip">
-          <div className="scroll-left" style={{ display: 'flex', alignItems: 'center' }}>
-            {renderItems(brands)}
-            {renderItems(brands)}
+          <div className="scroll-logo">
+            {[...logoClients, ...logoClients].map((client, i) => (
+              <React.Fragment key={i}>
+                <LogoItem client={client} />
+                <span style={{ display: 'inline-block', width: '1px', height: '16px', background: 'rgba(var(--fg-rgb),0.08)', flexShrink: 0 }} />
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </div>
-      <div style={{ padding: '20px 0' }}>
+
+      {/* Strip 2 — Brands & Corporate */}
+      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.04)' }}>
         <div className="client-strip">
-          <div className="scroll-right" style={{ display: 'flex', alignItems: 'center' }}>
-            {renderItems(talent)}
-            {renderItems(talent)}
+          <div className="scroll-left">
+            {[...brandClients, ...brandClients].map((name, i) => (
+              <TextItem key={i} name={name} />
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Strip 3 — Talent, Arts & Education */}
+      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+        <div className="client-strip">
+          <div className="scroll-right">
+            {[...talentClients, ...talentClients].map((name, i) => (
+              <TextItem key={i} name={name} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+    </section>
+  );
+};
+
+// ─── Testimonials ─────────────────────────────────────────────
+const TestimonialsSection = () => {
+  useReveal();
+  const testimonials = [
+    {
+      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      name: 'Sophie Conran',
+      role: 'Designer & Entrepreneur',
+    },
+    {
+      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      name: 'Ashley Banjo MBE',
+      role: 'Founder, Diversity · Soul Tour 2026',
+    },
+    {
+      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      name: 'International Collective',
+      role: 'Creative Production Partner',
+    },
+  ];
+
+  return (
+    <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-secondary)' }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>WHAT CLIENTS SAY</p>
+        <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>
+          In their own words.
+        </h2>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2px' }}>
+        {testimonials.map((t, i) => (
+          <div key={i} className="reveal" style={{ background: 'var(--bg-primary)', padding: 'clamp(28px,4vw,44px)', borderTop: '1px solid rgba(var(--fg-rgb),0.08)' }}>
+            <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.18)', letterSpacing: '0.3em', marginBottom: '20px' }}>❝</p>
+            <p style={{ fontSize: 'clamp(14px,1.5vw,17px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.55)', lineHeight: 1.8, marginBottom: '28px', fontStyle: 'italic', textWrap: 'pretty' }}>{t.quote}</p>
+            <div style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.07)', paddingTop: '16px' }}>
+              <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--fg-primary)', marginBottom: '4px' }}>{t.name}</p>
+              <p style={{ fontSize: '11px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.3)', letterSpacing: '0.05em' }}>{t.role}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -268,6 +395,7 @@ const ServicesSection = () => {
 // ─── Portfolio ────────────────────────────────────────────────
 const PortfolioSection = () => {
   useReveal();
+  const [hovered, setHovered] = React.useState(null);
   const projects = [
     {
       title: 'Soul — Diversity',
@@ -292,15 +420,12 @@ const PortfolioSection = () => {
     },
   ];
 
-  const [hovered, setHovered] = React.useState(null);
-
   return (
     <section id="portfolio" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
       <div className="reveal" style={{ marginBottom: 'clamp(36px,5vw,56px)' }}>
         <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '14px' }}>OUR WORK</p>
         <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>Selected projects.</h2>
       </div>
-
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {projects.map((project, i) => (
           <div key={i} className="reveal"
@@ -323,9 +448,7 @@ const PortfolioSection = () => {
                   <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.7, fontStyle: 'italic', maxWidth: '560px', borderLeft: '2px solid rgba(var(--fg-rgb),0.12)', paddingLeft: '16px' }}>{project.quote}</p>
                 )}
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)' }}>{project.year}</span>
-              </div>
+              <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }}>{project.year}</span>
             </div>
           </div>
         ))}
@@ -465,8 +588,7 @@ const App = () => {
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('qm_theme', next);
+    setTheme(next); localStorage.setItem('qm_theme', next);
     document.documentElement.setAttribute('data-theme', next);
   };
 
@@ -484,10 +606,11 @@ const App = () => {
         {page === 'home' && (
           <>
             <HeroSection onBook={openBook} />
-            <ClientStrip />
+            <ClientStrips />
             <AboutSection />
             <ServicesSection />
             <PortfolioSection />
+            <TestimonialsSection />
             <TeamPreviewSection onNavigate={navigate} />
             <BookingCTASection onBook={openBook} />
           </>
