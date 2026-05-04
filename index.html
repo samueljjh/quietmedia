@@ -13,6 +13,21 @@
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes scrollRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.scroll-left { animation: scrollLeft 40s linear infinite; display: flex; width: max-content; }
+.scroll-right { animation: scrollRight 40s linear infinite; display: flex; width: max-content; }
+.client-strip { overflow: hidden; width: 100%; }
+.client-strip:hover .scroll-left,
+.client-strip:hover .scroll-right { animation-play-state: paused; }
+</style>
 </head>
 <body>
 <div id="root"></div>
@@ -26,14 +41,10 @@ const QMark = ({ size = 22, color = 'var(--fg-primary)', style = {} }) => {
       background: color,
       maskImage: 'url(assets/logo.svg)',
       WebkitMaskImage: 'url(assets/logo.svg)',
-      maskSize: 'contain',
-      WebkitMaskSize: 'contain',
-      maskRepeat: 'no-repeat',
-      WebkitMaskRepeat: 'no-repeat',
-      maskPosition: 'center',
-      WebkitMaskPosition: 'center',
-      display: 'block', flexShrink: 0,
-      ...style,
+      maskSize: 'contain', WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center', WebkitMaskPosition: 'center',
+      display: 'block', flexShrink: 0, ...style,
     }} />
   );
 };
@@ -57,113 +68,49 @@ const useReveal = () => {
   });
 };
 
-// ─── Hero ────────────────────────────────────────────────────
+// ─── Hero ─────────────────────────────────────────────────────
 const HeroSection = ({ onBook }) => {
   const [loaded, setLoaded] = React.useState(false);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
-
   React.useEffect(() => { setTimeout(() => setLoaded(true), 80); }, []);
-
-  const openLightbox = () => {
-    setLightboxOpen(true);
-    document.body.style.overflow = 'hidden';
-  };
-
-  const closeLightbox = () => {
-    setLightboxOpen(false);
-    document.body.style.overflow = '';
-  };
+  const openLightbox = () => { setLightboxOpen(true); document.body.style.overflow = 'hidden'; };
+  const closeLightbox = () => { setLightboxOpen(false); document.body.style.overflow = ''; };
 
   return (
     <>
       <section style={{
         position: 'relative', width: '100%', height: '100vh', minHeight: '640px',
-        background: '#0A0A0A',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        overflow: 'hidden',
+        background: '#0A0A0A', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
       }}>
-        {/* Background Vimeo video */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          opacity: lightboxOpen ? 0.08 : 1,
-          transition: 'opacity 0.6s ease',
-        }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: lightboxOpen ? 0.08 : 1, transition: 'opacity 0.6s ease' }}>
           <iframe
             src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&background=1&autoplay=1&loop=1&byline=0&title=0&muted=1"
-            style={{
-              position: 'absolute',
-              top: '50%', left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '177.78vh',
-              minWidth: '100%',
-              height: '56.25vw',
-              minHeight: '100%',
-              border: 'none',
-            }}
-            allow="autoplay; fullscreen"
-            frameBorder="0"
+            style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
+            allow="autoplay; fullscreen" frameBorder="0"
           />
         </div>
-
-        {/* Dark overlay */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)', pointerEvents: 'none' }} />
         <div style={{
-          position: 'absolute', inset: 0, zIndex: 1,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* Content */}
-        <div style={{
-          position: 'relative', zIndex: 2,
-          textAlign: 'center',
+          position: 'relative', zIndex: 2, textAlign: 'center',
           padding: '0 clamp(24px, 6vw, 80px)',
-          opacity: loaded ? 1 : 0,
-          transform: loaded ? 'translateY(0)' : 'translateY(20px)',
+          opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(20px)',
           transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s',
         }}>
-          <p style={{
-            fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em',
-            textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
-            marginBottom: '28px',
-          }}>WILTSHIRE, UK · EST. 2020</p>
-
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '28px' }}>WILTSHIRE, UK · EST. 2020</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(16px, 2.5vw, 32px)', marginBottom: '28px' }}>
             <QMark size={88} style={{ width: 'clamp(44px, 7vw, 88px)', height: 'clamp(44px, 7vw, 88px)', display: 'block' }} />
-            <h1 style={{
-              fontSize: 'clamp(56px, 9vw, 110px)',
-              fontWeight: 300, letterSpacing: '-0.025em',
-              color: '#ffffff', lineHeight: 1.0, margin: 0,
-            }}>quiet media</h1>
+            <h1 style={{ fontSize: 'clamp(56px, 9vw, 110px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#ffffff', lineHeight: 1.0, margin: 0 }}>quiet media</h1>
           </div>
-
-          <p style={{
-            fontSize: 'clamp(13px, 1.4vw, 16px)',
-            fontWeight: 300, color: 'rgba(255,255,255,0.42)',
-            letterSpacing: '0.05em', lineHeight: 1.7,
-            maxWidth: '480px', margin: '0 auto 44px',
-          }}>
-            Boutique film production. We bring your vision to life with cinematic craft and quiet precision.
+          <p style={{ fontSize: 'clamp(13px, 1.4vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.42)', letterSpacing: '0.05em', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 44px' }}>
+            Boutique film production. Human stories, told with craft and quiet precision.
           </p>
-
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onBook} style={{
-              fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
-              color: '#0A0A0A', background: '#ffffff', border: 'none',
-              padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s',
-            }}
+            <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >BOOK AN INTRO CALL</button>
-
-            <button onClick={openLightbox} style={{
-              fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.7)', background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.25)',
-              padding: '16px 36px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '8px',
-              transition: 'border-color 0.2s, color 0.2s',
-            }}
+            <button onClick={openLightbox} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
             >
@@ -174,30 +121,13 @@ const HeroSection = ({ onBook }) => {
         </div>
       </section>
 
-      {/* Lightbox */}
       {lightboxOpen && (
-        <div onClick={closeLightbox} style={{
-          position: 'fixed', inset: 0, zIndex: 999,
-          background: 'rgba(0,0,0,0.92)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '40px',
-        }}>
-          <button onClick={closeLightbox} style={{
-            position: 'absolute', top: '24px', right: '24px',
-            background: 'none', border: 'none', color: '#fff',
-            fontSize: '28px', cursor: 'pointer', opacity: 0.6,
-            lineHeight: 1,
-          }}>✕</button>
-          <div onClick={e => e.stopPropagation()} style={{
-            width: '100%', maxWidth: '1000px',
-            aspectRatio: '16/9', position: 'relative',
-          }}>
-            <iframe
-              src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&autoplay=1&title=0&byline=0&portrait=0"
+        <div onClick={closeLightbox} style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+          <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'pointer', opacity: 0.6, lineHeight: 1 }}>✕</button>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '1000px', aspectRatio: '16/9', position: 'relative' }}>
+            <iframe src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&autoplay=1&title=0&byline=0&portrait=0"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-            />
+              allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
           </div>
         </div>
       )}
@@ -205,36 +135,80 @@ const HeroSection = ({ onBook }) => {
   );
 };
 
-// ─── About / Ethos ───────────────────────────────────────────
+// ─── Client Strip ─────────────────────────────────────────────
+const ClientStrip = () => {
+  const brands = ['Paramount+', 'Amazon Prime', 'John Lewis', 'Tesco', 'M&S', 'Dreams', 'Optical Express', 'F&F', 'Pep & Co', 'Sophie Conran', 'Six Senses', 'Crowcon', 'Aream & Co', 'International Collective', 'David Michael Productions', 'Agency 105'];
+  const talent = ['Diversity', 'Ashley Banjo', 'Junior Eurovision', 'Queenz', "Frankie's Guys", 'Chiswick Cinema', 'Move It', 'Horizon', 'Louise Dearman', 'Kele Le Roc', 'MAZZA', 'Zoe Birkett', 'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning', 'Chris Manoe', 'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle', 'UP Clothing', 'Wilkes Academy', 'Performers College', 'LIPA', 'The Hammond', 'Shockout Arts', 'McLaren Dance Company', 'Tap Attack', 'Diverse Dubai'];
+
+  const itemStyle = {
+    fontSize: '11px', fontWeight: 500, letterSpacing: '0.18em',
+    textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)',
+    whiteSpace: 'nowrap', padding: '0 32px',
+    transition: 'color 0.2s', cursor: 'default',
+  };
+
+  const Divider = () => <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.12)', flexShrink: 0, alignSelf: 'center' }} />;
+
+  const renderItems = (items) => items.map((name, i) => (
+    <React.Fragment key={i}>
+      <span style={itemStyle}
+        onMouseEnter={e => e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.7)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.28)'}
+      >{name}</span>
+      <Divider />
+    </React.Fragment>
+  ));
+
+  return (
+    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0', overflow: 'hidden' }}>
+      <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.04)', padding: '20px 0' }}>
+        <div className="client-strip">
+          <div className="scroll-left" style={{ display: 'flex', alignItems: 'center' }}>
+            {renderItems(brands)}
+            {renderItems(brands)}
+          </div>
+        </div>
+      </div>
+      <div style={{ padding: '20px 0' }}>
+        <div className="client-strip">
+          <div className="scroll-right" style={{ display: 'flex', alignItems: 'center' }}>
+            {renderItems(talent)}
+            {renderItems(talent)}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── About ────────────────────────────────────────────────────
 const AboutSection = () => {
   useReveal();
   return (
-    <section id="about" className="two-col-grid" style={{
-      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
-      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-      gap: 'clamp(40px,6vw,100px)',
-    }}>
+    <section id="about" className="two-col-grid" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', gap: 'clamp(40px,6vw,100px)' }}>
       <div className="reveal">
         <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>ABOUT</p>
         <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, marginBottom: '28px', textWrap: 'pretty' }}>
           You come to us when you want a trusted partner.
         </h2>
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, marginBottom: '16px', textWrap: 'pretty' }}>
-          Quiet Media is a boutique film production company founded by Samuel and Tamy in 2020. We work with brands, artists, and organisations who care about quality — and who want a team that listens as much as it creates.
+          Quiet Media is a boutique film production company founded by Samuel and Tamy in 2020. We work with brands, artists, performers and organisations who care about quality — and who want a team that listens as much as it creates.
         </p>
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, textWrap: 'pretty' }}>
           We keep our team small by design. Every project gets our full attention, from the first call to the final export.
         </p>
       </div>
-      <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
         {[
-          { label: 'FOUNDED', value: '2020' },
-          { label: 'BASED', value: 'Wiltshire, UK' },
-          { label: 'FOCUS', value: 'Boutique film production' },
-        ].map(item => (
-          <div key={item.label} style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.07)', paddingTop: '20px' }}>
-            <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '8px' }}>{item.label}</p>
-            <p style={{ fontSize: '17px', fontWeight: 300, color: 'var(--fg-primary)' }}>{item.value}</p>
+          { word: 'QUIET', desc: 'We let the work speak.' },
+          { word: 'FOCUSED', desc: 'Every decision serves the story.' },
+          { word: 'PURPOSEFUL', desc: 'Nothing is accidental.' },
+          { word: 'RELIABLE', desc: 'You can count on us, every time.' },
+          { word: 'CREATIVE', desc: 'Craft is at the centre of everything.' },
+        ].map((item) => (
+          <div key={item.word} style={{ display: 'flex', alignItems: 'baseline', gap: '20px', padding: '18px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+            <span style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', color: 'rgba(var(--fg-rgb),0.22)', minWidth: '100px' }}>{item.word}</span>
+            <span style={{ fontSize: '14px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', letterSpacing: '0.01em' }}>{item.desc}</span>
           </div>
         ))}
       </div>
@@ -246,33 +220,44 @@ const AboutSection = () => {
 const ServicesSection = () => {
   useReveal();
   const services = [
-    { title: 'Commercial & Brand Film', desc: 'We create cinematic brand films that communicate who you are and what you stand for — built to work across digital, social, and broadcast.' },
-    { title: 'Showreels', desc: 'For actors, presenters, and creatives. We help you present your best work with clarity and craft — shoots tailored specifically to your strengths.' },
-    { title: 'Documentary & Narrative', desc: 'From short-form documentary to narrative fiction, we bring the same attention to story and image to every project we take on.' },
-    { title: 'Event & Live Coverage', desc: 'Conferences, performances, launches. We capture the energy of live moments with a cinematic approach that goes beyond standard event video.' },
+    {
+      label: 'CORPORATE & BRAND',
+      title: 'Video that elevates your business.',
+      items: ['Talking head interviews', 'Brand identity films', 'Social media content', 'Event coverage', 'Teleprompter-equipped shoots'],
+    },
+    {
+      label: 'FILM & NARRATIVE',
+      title: 'Storytelling from concept to final cut.',
+      items: ['Short film production', 'Feature-length projects', 'Music videos', 'Dramatic & narrative content', 'Documentary'],
+    },
+    {
+      label: 'ARTISTS & PERFORMERS',
+      title: 'Bringing your talent to the screen.',
+      items: ['Music videos', 'Live performance capture', 'Artist content & EPKs', 'Dance & performance films', 'Tour & event films'],
+    },
   ];
+
   return (
-    <section style={{
-      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
-      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-      background: 'var(--bg-secondary)',
-    }}>
-      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,80px)' }}>
+    <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
         <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>WHAT WE DO</p>
-        <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, maxWidth: '480px', textWrap: 'pretty' }}>
-          Film production that serves the work.
+        <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>
+          Film production for those<br />who care about quality.
         </h2>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2px' }}>
         {services.map((s, i) => (
-          <div key={i} className="reveal" style={{
-            padding: 'clamp(28px,3vw,40px)',
-            background: 'var(--bg-primary)',
-            borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-          }}>
-            <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.22)', marginBottom: '16px' }}>0{i + 1}</p>
-            <h3 style={{ fontSize: 'clamp(16px,1.8vw,20px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.01em', marginBottom: '14px', lineHeight: 1.2 }}>{s.title}</h3>
-            <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.4)', lineHeight: 1.8, textWrap: 'pretty' }}>{s.desc}</p>
+          <div key={i} className="reveal" style={{ background: 'var(--bg-secondary)', padding: 'clamp(28px,4vw,44px)', borderTop: '1px solid rgba(var(--fg-rgb),0.08)', display: 'flex', flexDirection: 'column' }}>
+            <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '18px' }}>{s.label}</p>
+            <h3 style={{ fontSize: 'clamp(18px,2vw,22px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.01em', lineHeight: 1.25, marginBottom: '24px', textWrap: 'pretty' }}>{s.title}</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+              {s.items.map((item, j) => (
+                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.25)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.5 }}>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
@@ -284,80 +269,66 @@ const ServicesSection = () => {
 const PortfolioSection = () => {
   useReveal();
   const projects = [
-    { title: 'Brand Film', client: 'Client A', year: '2024', type: 'Commercial' },
-    { title: 'Actor Showreel', client: 'Client B', year: '2024', type: 'Showreel' },
-    { title: 'Short Documentary', client: 'Client C', year: '2023', type: 'Documentary' },
-    { title: 'Live Event', client: 'Client D', year: '2023', type: 'Event' },
+    {
+      title: 'Soul — Diversity',
+      type: 'SHORT FILM SERIES',
+      year: '2026',
+      detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
+      quote: 'Films exploring humanity and human connection in a world full of AI.',
+    },
+    {
+      title: 'Look to the Light',
+      type: 'FEATURE FILM',
+      year: '2023',
+      detail: 'Director of Photography & Producer · Available on Amazon Prime',
+      quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
+    },
+    {
+      title: 'Hellfire the Film',
+      type: 'FILM PROJECT',
+      year: '2023',
+      detail: 'Quiet Media production',
+      quote: '',
+    },
   ];
+
+  const [hovered, setHovered] = React.useState(null);
+
   return (
-    <section id="work" style={{
-      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
-      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-    }}>
-      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,80px)' }}>
-        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>SELECTED WORK</p>
-        <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, textWrap: 'pretty' }}>
-          Projects we're proud of.
-        </h2>
+    <section id="portfolio" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(36px,5vw,56px)' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '14px' }}>OUR WORK</p>
+        <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>Selected projects.</h2>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        {projects.map((p, i) => (
-          <div key={i} className="reveal" style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '28px 0',
-            borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
-            cursor: 'pointer',
-            transition: 'opacity 0.2s',
-          }}
-            onMouseEnter={e => e.currentTarget.style.opacity = '0.6'}
-            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {projects.map((project, i) => (
+          <div key={i} className="reveal"
+            onMouseEnter={() => setHovered(i)}
+            onMouseLeave={() => setHovered(null)}
+            style={{
+              padding: 'clamp(28px,4vw,44px) 0',
+              borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
+              borderBottom: i === projects.length - 1 ? '1px solid rgba(var(--fg-rgb),0.07)' : 'none',
+              transition: 'opacity 0.2s',
+              opacity: hovered !== null && hovered !== i ? 0.4 : 1,
+            }}
           >
-            <div>
-              <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '6px' }}>{p.type}</p>
-              <h3 style={{ fontSize: 'clamp(18px,2.5vw,28px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.015em' }}>{p.title}</h3>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.3)', marginBottom: '4px' }}>{p.client}</p>
-              <p style={{ fontSize: '12px', color: 'rgba(var(--fg-rgb),0.2)' }}>{p.year}</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '10px' }}>{project.type}</p>
+                <h3 style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.02em', marginBottom: '12px', lineHeight: 1.1 }}>{project.title}</h3>
+                <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.35)', lineHeight: 1.7, marginBottom: project.quote ? '16px' : '0', maxWidth: '560px' }}>{project.detail}</p>
+                {project.quote && (
+                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.7, fontStyle: 'italic', maxWidth: '560px', borderLeft: '2px solid rgba(var(--fg-rgb),0.12)', paddingLeft: '16px' }}>{project.quote}</p>
+                )}
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)' }}>{project.year}</span>
+              </div>
             </div>
           </div>
         ))}
-      </div>
-    </section>
-  );
-};
-
-// ─── Team Preview ─────────────────────────────────────────────
-const TeamPreviewSection = ({ onNavigate }) => {
-  useReveal();
-  return (
-    <section style={{
-      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
-      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-      background: 'var(--bg-secondary)',
-    }}>
-      <div className="reveal two-col-grid" style={{ gap: 'clamp(40px,6vw,100px)', alignItems: 'center' }}>
-        <div>
-          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>THE TEAM</p>
-          <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
-            Samuel &amp; Tamy.
-          </h2>
-          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
-            A director and a producer. A small team with a large commitment to doing the work properly.
-          </p>
-          <button onClick={() => onNavigate('team')} style={{
-            fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
-            color: 'var(--fg-primary)', background: 'none',
-            border: '1px solid rgba(var(--fg-rgb),0.2)',
-            padding: '14px 28px', cursor: 'pointer', transition: 'border-color 0.2s',
-          }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.5)'}
-            onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.2)'}
-          >MEET THE TEAM</button>
-        </div>
-        <div style={{ aspectRatio: '4/3', overflow: 'hidden' }}>
-          <img src="assets/team.jpg" alt="Samuel and Tamy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }} />
-        </div>
       </div>
     </section>
   );
@@ -367,23 +338,54 @@ const TeamPreviewSection = ({ onNavigate }) => {
 const BookingCTASection = ({ onBook }) => {
   useReveal();
   return (
-    <section style={{ background: '#EDECE8', padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)' }}>
-      <div className="reveal" style={{ maxWidth: '560px' }}>
-        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>WORK WITH US</p>
-        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
-          Ready to start a conversation?
+    <section id="book" style={{ background: '#EDECE8', padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)' }}>
+      <div className="reveal" style={{ maxWidth: '680px' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '24px' }}>BOOK A CALL</p>
+        <h2 style={{ fontSize: 'clamp(32px,5vw,62px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.05, marginBottom: '28px', textWrap: 'pretty' }}>
+          Let's talk about<br />your project.
         </h2>
-        <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
-          Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
+        <p style={{ fontSize: '16px', fontWeight: 300, color: 'rgba(10,10,10,0.5)', lineHeight: 1.8, maxWidth: '480px', marginBottom: '40px', textWrap: 'pretty' }}>
+          A 30-minute introductory call to understand your vision, answer questions, and explore how we can work together. No pressure, no obligation.
         </p>
-        <button onClick={onBook} style={{
-          fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
-          color: '#fff', background: '#0A0A0A', border: 'none',
-          padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s',
-        }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-        >BOOK AN INTRO CALL</button>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'pointer', transition: 'opacity 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >BOOK AN INTRO CALL</button>
+          <a href="mailto:tamy@quietmedia.co.uk" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'pointer', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}
+          >SEND AN EMAIL</a>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── Team Preview ─────────────────────────────────────────────
+const TeamPreviewSection = ({ onNavigate }) => {
+  useReveal();
+  return (
+    <section className="two-col-grid" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+        {[{ name: 'Samuel', src: 'assets/samuel.jpg' }, { name: 'Tamy', src: 'assets/tamy.jpg' }].map((person) => (
+          <div key={person.name} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
+            <img src={person.src} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+          </div>
+        ))}
+      </div>
+      <div className="reveal">
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>THE TEAM</p>
+        <h2 style={{ fontSize: 'clamp(26px,3.5vw,42px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.15, marginBottom: '24px', textWrap: 'pretty' }}>
+          Founded by Samuel &amp; Tamy in 2020.
+        </h2>
+        <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
+          Two filmmakers who share a commitment to craft, collaboration, and telling stories that matter. Every project we take on, we treat as our own.
+        </p>
+        <button onClick={() => onNavigate('team')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s' }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.45)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.18)'; e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.55)'; }}
+        >MEET THE TEAM</button>
       </div>
     </section>
   );
@@ -405,7 +407,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
       role: 'Producer & Co-founder',
       src: 'assets/tamy.jpg',
       bio: "Tamy is the connective tissue of every project — the person who makes sure vision translates to reality, on schedule, and within budget. Her warmth and professionalism put clients at ease from first call to final delivery.",
-      detail: 'Specialises in production management, client relationships, showreel direction, and post-production coordination. Passionate about supporting performers and helping them present their best work.',
+      detail: 'Specialises in production management, client relationships, and post-production coordination. Passionate about working with artists, brands and performers to help them present their best work.',
     },
   ];
 
@@ -414,29 +416,18 @@ const TeamPage = ({ onNavigate, onBook }) => {
       <div style={{ width: '100%', aspectRatio: '16/7', overflow: 'hidden', marginTop: '68px' }}>
         <img src="assets/team.jpg" alt="Samuel and Tamy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }} />
       </div>
-
-      <section style={{
-        padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)',
-        borderBottom: '1px solid rgba(var(--fg-rgb),0.06)',
-      }}>
+      <section style={{ padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
         <div className="reveal">
           <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>MEET THE TEAM</p>
-          <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0, marginBottom: '24px' }}>
-            Samuel &amp; Tamy.
-          </h1>
+          <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0, marginBottom: '24px' }}>Samuel &amp; Tamy.</h1>
           <p style={{ fontSize: 'clamp(14px,1.5vw,17px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.4)', lineHeight: 1.8, maxWidth: '520px', textWrap: 'pretty' }}>
             A small team with a large commitment to doing the work properly.
           </p>
         </div>
       </section>
-
       <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
         {members.map((m, i) => (
-          <div key={m.name} className="reveal two-col-grid" style={{
-            alignItems: 'start',
-            padding: 'clamp(40px,5vw,64px) 0',
-            borderBottom: i < members.length - 1 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none',
-          }}>
+          <div key={m.name} className="reveal two-col-grid" style={{ alignItems: 'start', padding: 'clamp(40px,5vw,64px) 0', borderBottom: i < members.length - 1 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none' }}>
             <div style={{ aspectRatio: '4/5', overflow: 'hidden', order: i % 2 === 1 ? 1 : 0 }}>
               <img src={m.src} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
             </div>
@@ -449,21 +440,14 @@ const TeamPage = ({ onNavigate, onBook }) => {
           </div>
         ))}
       </section>
-
       <section style={{ background: '#EDECE8', padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)' }}>
         <div className="reveal" style={{ maxWidth: '560px' }}>
           <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>WORK WITH US</p>
-          <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
-            Ready to start a conversation?
-          </h2>
+          <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>Ready to start a conversation?</h2>
           <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
             Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
           </p>
-          <button onClick={onBook} style={{
-            fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
-            color: '#fff', background: '#0A0A0A', border: 'none',
-            padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s',
-          }}
+          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
@@ -488,9 +472,7 @@ const App = () => {
 
   const navigate = (p) => {
     if (p === 'book') { setBookingOpen(true); return; }
-    setPage(p);
-    sessionStorage.setItem('qm_page', p);
-    window.scrollTo({ top: 0 });
+    setPage(p); sessionStorage.setItem('qm_page', p); window.scrollTo({ top: 0 });
   };
 
   const openBook = () => setBookingOpen(true);
@@ -502,6 +484,7 @@ const App = () => {
         {page === 'home' && (
           <>
             <HeroSection onBook={openBook} />
+            <ClientStrip />
             <AboutSection />
             <ServicesSection />
             <PortfolioSection />
