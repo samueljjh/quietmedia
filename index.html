@@ -1,3 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>quiet media — boutique film production</title>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('qm_theme') || 'dark');</script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const QMark = ({ size = 22, color = 'var(--fg-primary)', style = {} }) => {
+  const px = typeof size === 'number' ? `${size}px` : size;
+  return (
+    <div style={{
+      width: px, height: px,
+      background: color,
+      maskImage: 'url(assets/logo.svg)',
+      WebkitMaskImage: 'url(assets/logo.svg)',
+      maskSize: 'contain',
+      WebkitMaskSize: 'contain',
+      maskRepeat: 'no-repeat',
+      WebkitMaskRepeat: 'no-repeat',
+      maskPosition: 'center',
+      WebkitMaskPosition: 'center',
+      display: 'block', flexShrink: 0,
+      ...style,
+    }} />
+  );
+};
+Object.assign(window, { QMark });
+</script>
+
+<script type="text/babel" src="Header.jsx"></script>
+<script type="text/babel" src="Footer.jsx"></script>
+<script type="text/babel" src="BookingModal.jsx"></script>
+
+<script type="text/babel">
+
+const useReveal = () => {
+  React.useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(el => obs.observe(el));
+    return () => obs.disconnect();
+  });
+};
+
+// ─── Hero ────────────────────────────────────────────────────
 const HeroSection = ({ onBook }) => {
   const [loaded, setLoaded] = React.useState(false);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
@@ -23,7 +83,6 @@ const HeroSection = ({ onBook }) => {
         alignItems: 'center', justifyContent: 'center',
         overflow: 'hidden',
       }}>
-
         {/* Background Vimeo video */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 0,
@@ -145,3 +204,341 @@ const HeroSection = ({ onBook }) => {
     </>
   );
 };
+
+// ─── About / Ethos ───────────────────────────────────────────
+const AboutSection = () => {
+  useReveal();
+  return (
+    <section id="about" className="two-col-grid" style={{
+      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
+      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+      gap: 'clamp(40px,6vw,100px)',
+    }}>
+      <div className="reveal">
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>ABOUT</p>
+        <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, marginBottom: '28px', textWrap: 'pretty' }}>
+          You come to us when you want a trusted partner.
+        </h2>
+        <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, marginBottom: '16px', textWrap: 'pretty' }}>
+          Quiet Media is a boutique film production company founded by Samuel and Tamy in 2020. We work with brands, artists, and organisations who care about quality — and who want a team that listens as much as it creates.
+        </p>
+        <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, textWrap: 'pretty' }}>
+          We keep our team small by design. Every project gets our full attention, from the first call to the final export.
+        </p>
+      </div>
+      <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        {[
+          { label: 'FOUNDED', value: '2020' },
+          { label: 'BASED', value: 'Wiltshire, UK' },
+          { label: 'FOCUS', value: 'Boutique film production' },
+        ].map(item => (
+          <div key={item.label} style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.07)', paddingTop: '20px' }}>
+            <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '8px' }}>{item.label}</p>
+            <p style={{ fontSize: '17px', fontWeight: 300, color: 'var(--fg-primary)' }}>{item.value}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ─── Services ─────────────────────────────────────────────────
+const ServicesSection = () => {
+  useReveal();
+  const services = [
+    { title: 'Commercial & Brand Film', desc: 'We create cinematic brand films that communicate who you are and what you stand for — built to work across digital, social, and broadcast.' },
+    { title: 'Showreels', desc: 'For actors, presenters, and creatives. We help you present your best work with clarity and craft — shoots tailored specifically to your strengths.' },
+    { title: 'Documentary & Narrative', desc: 'From short-form documentary to narrative fiction, we bring the same attention to story and image to every project we take on.' },
+    { title: 'Event & Live Coverage', desc: 'Conferences, performances, launches. We capture the energy of live moments with a cinematic approach that goes beyond standard event video.' },
+  ];
+  return (
+    <section style={{
+      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
+      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+      background: 'var(--bg-secondary)',
+    }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,80px)' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>WHAT WE DO</p>
+        <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, maxWidth: '480px', textWrap: 'pretty' }}>
+          Film production that serves the work.
+        </h2>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2px' }}>
+        {services.map((s, i) => (
+          <div key={i} className="reveal" style={{
+            padding: 'clamp(28px,3vw,40px)',
+            background: 'var(--bg-primary)',
+            borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+          }}>
+            <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.22)', marginBottom: '16px' }}>0{i + 1}</p>
+            <h3 style={{ fontSize: 'clamp(16px,1.8vw,20px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.01em', marginBottom: '14px', lineHeight: 1.2 }}>{s.title}</h3>
+            <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.4)', lineHeight: 1.8, textWrap: 'pretty' }}>{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ─── Portfolio ────────────────────────────────────────────────
+const PortfolioSection = () => {
+  useReveal();
+  const projects = [
+    { title: 'Brand Film', client: 'Client A', year: '2024', type: 'Commercial' },
+    { title: 'Actor Showreel', client: 'Client B', year: '2024', type: 'Showreel' },
+    { title: 'Short Documentary', client: 'Client C', year: '2023', type: 'Documentary' },
+    { title: 'Live Event', client: 'Client D', year: '2023', type: 'Event' },
+  ];
+  return (
+    <section id="work" style={{
+      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
+      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+    }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,80px)' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>SELECTED WORK</p>
+        <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, textWrap: 'pretty' }}>
+          Projects we're proud of.
+        </h2>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        {projects.map((p, i) => (
+          <div key={i} className="reveal" style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '28px 0',
+            borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
+            cursor: 'pointer',
+            transition: 'opacity 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.6'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            <div>
+              <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '6px' }}>{p.type}</p>
+              <h3 style={{ fontSize: 'clamp(18px,2.5vw,28px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.015em' }}>{p.title}</h3>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.3)', marginBottom: '4px' }}>{p.client}</p>
+              <p style={{ fontSize: '12px', color: 'rgba(var(--fg-rgb),0.2)' }}>{p.year}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ─── Team Preview ─────────────────────────────────────────────
+const TeamPreviewSection = ({ onNavigate }) => {
+  useReveal();
+  return (
+    <section style={{
+      padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)',
+      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+      background: 'var(--bg-secondary)',
+    }}>
+      <div className="reveal two-col-grid" style={{ gap: 'clamp(40px,6vw,100px)', alignItems: 'center' }}>
+        <div>
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>THE TEAM</p>
+          <h2 style={{ fontSize: 'clamp(30px,4vw,52px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
+            Samuel &amp; Tamy.
+          </h2>
+          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
+            A director and a producer. A small team with a large commitment to doing the work properly.
+          </p>
+          <button onClick={() => onNavigate('team')} style={{
+            fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
+            color: 'var(--fg-primary)', background: 'none',
+            border: '1px solid rgba(var(--fg-rgb),0.2)',
+            padding: '14px 28px', cursor: 'pointer', transition: 'border-color 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.5)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.2)'}
+          >MEET THE TEAM</button>
+        </div>
+        <div style={{ aspectRatio: '4/3', overflow: 'hidden' }}>
+          <img src="assets/team.jpg" alt="Samuel and Tamy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }} />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── Booking CTA ──────────────────────────────────────────────
+const BookingCTASection = ({ onBook }) => {
+  useReveal();
+  return (
+    <section style={{ background: '#EDECE8', padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)' }}>
+      <div className="reveal" style={{ maxWidth: '560px' }}>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>WORK WITH US</p>
+        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
+          Ready to start a conversation?
+        </h2>
+        <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
+          Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
+        </p>
+        <button onClick={onBook} style={{
+          fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
+          color: '#fff', background: '#0A0A0A', border: 'none',
+          padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s',
+        }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >BOOK AN INTRO CALL</button>
+      </div>
+    </section>
+  );
+};
+
+// ─── Team Page ────────────────────────────────────────────────
+const TeamPage = ({ onNavigate, onBook }) => {
+  useReveal();
+  const members = [
+    {
+      name: 'Samuel',
+      role: 'Director & Co-founder',
+      src: 'assets/samuel.jpg',
+      bio: "Samuel brings a cinematic eye and a director's instinct to everything quiet media produces. With a background spanning narrative film and commercial production, he leads shoots with calm authority — always focused on the story.",
+      detail: 'Specialises in directing, cinematography, and post-production. Has worked on short films, feature projects, corporate campaigns, and live events across the UK.',
+    },
+    {
+      name: 'Tamy',
+      role: 'Producer & Co-founder',
+      src: 'assets/tamy.jpg',
+      bio: "Tamy is the connective tissue of every project — the person who makes sure vision translates to reality, on schedule, and within budget. Her warmth and professionalism put clients at ease from first call to final delivery.",
+      detail: 'Specialises in production management, client relationships, showreel direction, and post-production coordination. Passionate about supporting performers and helping them present their best work.',
+    },
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh' }}>
+      <div style={{ width: '100%', aspectRatio: '16/7', overflow: 'hidden', marginTop: '68px' }}>
+        <img src="assets/team.jpg" alt="Samuel and Tamy" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }} />
+      </div>
+
+      <section style={{
+        padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)',
+        borderBottom: '1px solid rgba(var(--fg-rgb),0.06)',
+      }}>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>MEET THE TEAM</p>
+          <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0, marginBottom: '24px' }}>
+            Samuel &amp; Tamy.
+          </h1>
+          <p style={{ fontSize: 'clamp(14px,1.5vw,17px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.4)', lineHeight: 1.8, maxWidth: '520px', textWrap: 'pretty' }}>
+            A small team with a large commitment to doing the work properly.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        {members.map((m, i) => (
+          <div key={m.name} className="reveal two-col-grid" style={{
+            alignItems: 'start',
+            padding: 'clamp(40px,5vw,64px) 0',
+            borderBottom: i < members.length - 1 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none',
+          }}>
+            <div style={{ aspectRatio: '4/5', overflow: 'hidden', order: i % 2 === 1 ? 1 : 0 }}>
+              <img src={m.src} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+            </div>
+            <div style={{ order: i % 2 === 1 ? 0 : 1, paddingTop: '8px' }}>
+              <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '14px' }}>{m.role}</p>
+              <h2 style={{ fontSize: 'clamp(32px,4vw,52px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.025em', lineHeight: 1.05, marginBottom: '24px' }}>{m.name}</h2>
+              <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.85, marginBottom: '20px', textWrap: 'pretty' }}>{m.bio}</p>
+              <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.3)', lineHeight: 1.8, textWrap: 'pretty' }}>{m.detail}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section style={{ background: '#EDECE8', padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)' }}>
+        <div className="reveal" style={{ maxWidth: '560px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>WORK WITH US</p>
+          <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '24px', textWrap: 'pretty' }}>
+            Ready to start a conversation?
+          </h2>
+          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
+            Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
+          </p>
+          <button onClick={onBook} style={{
+            fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
+            color: '#fff', background: '#0A0A0A', border: 'none',
+            padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >BOOK AN INTRO CALL</button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ─── App ──────────────────────────────────────────────────────
+const App = () => {
+  const [page, setPage] = React.useState(() => sessionStorage.getItem('qm_page') || 'home');
+  const [bookingOpen, setBookingOpen] = React.useState(false);
+  const [theme, setTheme] = React.useState(() => localStorage.getItem('qm_theme') || 'dark');
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('qm_theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+  };
+
+  const navigate = (p) => {
+    if (p === 'book') { setBookingOpen(true); return; }
+    setPage(p);
+    sessionStorage.setItem('qm_page', p);
+    window.scrollTo({ top: 0 });
+  };
+
+  const openBook = () => setBookingOpen(true);
+
+  return (
+    <>
+      <QMHeader currentPage={page} onNavigate={navigate} theme={theme} onToggleTheme={toggleTheme} />
+      <main style={{ paddingTop: page === 'home' ? '0' : '68px' }}>
+        {page === 'home' && (
+          <>
+            <HeroSection onBook={openBook} />
+            <AboutSection />
+            <ServicesSection />
+            <PortfolioSection />
+            <TeamPreviewSection onNavigate={navigate} />
+            <BookingCTASection onBook={openBook} />
+          </>
+        )}
+        {page === 'work' && (
+          <>
+            <section style={{ padding: 'clamp(100px,12vw,160px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+              <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>OUR WORK</p>
+              <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0 }}>Selected projects.</h1>
+            </section>
+            <PortfolioSection />
+            <BookingCTASection onBook={openBook} />
+          </>
+        )}
+        {page === 'about' && (
+          <>
+            <section style={{ padding: 'clamp(100px,12vw,160px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+              <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>ABOUT</p>
+              <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0 }}>Who we are.</h1>
+            </section>
+            <AboutSection />
+            <ServicesSection />
+            <BookingCTASection onBook={openBook} />
+          </>
+        )}
+        {page === 'team' && <TeamPage onNavigate={navigate} onBook={openBook} />}
+      </main>
+      <QMFooter onNavigate={navigate} />
+      <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
