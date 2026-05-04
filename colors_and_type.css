@@ -1,0 +1,116 @@
+/* ============================================================
+   QUIET MEDIA — Design System: Colors & Typography
+   quietmedia.co.uk · Founded 2020 · Wiltshire, UK
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ─── Dark mode (default) ─────────────────────────────────── */
+:root {
+  --bg-primary:    #0A0A0A;
+  --bg-secondary:  #111111;
+  --fg-primary:    #FFFFFF;
+  --fg-rgb:        255, 255, 255;
+  --bg-rgb:        10, 10, 10;
+
+  --qm-cream:      #EDECE8;
+  --qm-tan:        #8A7F76;
+
+  --border-subtle: rgba(255,255,255,0.07);
+
+  --font-sans:     'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif:    'DM Serif Display', Georgia, 'Times New Roman', serif;
+
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Light mode ──────────────────────────────────────────── */
+html[data-theme="light"] {
+  --bg-primary:    #F5F4F2;
+  --bg-secondary:  #EEECEA;
+  --fg-primary:    #0A0A0A;
+  --fg-rgb:        10, 10, 10;
+  --bg-rgb:        245, 244, 242;
+
+  --border-subtle: rgba(10,10,10,0.07);
+}
+
+/* ─── Base ────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: rgba(var(--fg-rgb), 0.08); }
+
+/* ─── Film grain overlay ──────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 1000;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ─── Scroll reveal ───────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── Form elements ───────────────────────────────────────── */
+input::placeholder, textarea::placeholder { color: rgba(var(--fg-rgb), 0.2); }
+input:focus, textarea:focus { outline: none; }
+button { font-family: var(--font-sans); }
+
+/* ─── Mobile nav drawer ───────────────────────────────────── */
+.mobile-drawer {
+  position: fixed; inset: 0; z-index: 190;
+  background: var(--bg-primary);
+  display: flex; flex-direction: column;
+  padding: 100px 32px 48px;
+  transform: translateX(100%);
+  transition: transform 0.4s var(--ease-out);
+}
+.mobile-drawer.open { transform: translateX(0); }
+
+/* ─── Responsive two-column grid ──────────────────────────── */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+@media (max-width: 767px) {
+  .two-col-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .two-col-grid > * { order: unset !important; }
+}
+
+/* ─── Booking modal mobile ────────────────────────────────── */
+@media (max-width: 600px) {
+  .booking-date-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .booking-time-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .booking-modal-inner {
+    max-height: 100dvh !important; width: 100% !important;
+    max-width: 100% !important; margin: 0 !important;
+    align-self: flex-end !important;
+  }
+  .booking-overlay { align-items: flex-end !important; padding: 0 !important; }
+}

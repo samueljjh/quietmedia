@@ -1,10 +1,15 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+# OS
+.DS_Store
+Thumbs.db
 
-# Virtual environments
-.venv
+# Claude Code
+.claude/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies (if npm is ever added)
+node_modules/
