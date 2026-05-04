@@ -101,7 +101,7 @@ const QMFooter = ({ onNavigate }) => {
         padding: '18px clamp(24px,5vw,80px)',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
       }}>
-        <span style={{ fontSize: '10px', color: `rgba(var(--fg-rgb),0.18)`, letterSpacing: '0.06em' }}>© 2024 BY QUIET MEDIA LIMITED · ALL RIGHTS RESERVED</span>
+        <span style={{ fontSize: '10px', color: `rgba(var(--fg-rgb),0.18)`, letterSpacing: '0.06em' }}>© 2026 BY QUIET MEDIA LIMITED · ALL RIGHTS RESERVED</span>
         <span style={{ fontSize: '10px', color: `rgba(var(--fg-rgb),0.18)`, letterSpacing: '0.06em' }}>WILTSHIRE, UK</span>
       </div>
     </footer>
