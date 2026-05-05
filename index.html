@@ -14,19 +14,13 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
-const FeaturedItem = ({ client }) => {
-  const imgSrc = client.url || (client.slug ? `https://cdn.simpleicons.org/${client.slug}/ffffff` : null);
-  return (
-    <div className="featured-item">
-      {imgSrc ? (
-        <img src={imgSrc} alt={client.name} onError={e => { e.target.style.display = 'none'; }} />
-      ) : (
-        <span className="logo-text">{client.name}</span>
-      )}
-      <div className="logo-tooltip">{client.tooltip}</div>
-    </div>
-  );
-};
+.featured-item { position: relative; padding: 0 48px; flex-shrink: 0; display: inline-flex; align-items: center; cursor: default; }
+.featured-item img { height: 44px; width: auto; max-width: 120px; object-fit: contain; display: block; opacity: 0.25; transition: opacity 0.3s ease; filter: brightness(0) invert(1); }
+.featured-item span.logo-text { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; color: rgba(255,255,255,0.25); transition: color 0.3s ease; font-family: 'DM Sans', sans-serif; }
+.featured-item .logo-tooltip { position: absolute; bottom: calc(100% + 14px); left: 50%; transform: translateX(-50%); background: rgba(10,10,10,0.97); border: 1px solid rgba(255,255,255,0.1); padding: 10px 16px; white-space: nowrap; pointer-events: none; z-index: 200; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.65); letter-spacing: 0.04em; line-height: 1.5; opacity: 0; transition: opacity 0.2s ease; }
+.featured-item:hover img { opacity: 0.9; }
+.featured-item:hover span.logo-text { color: rgba(255,255,255,0.9); }
+.featured-item:hover .logo-tooltip { opacity: 1; }
 </style>
 </head>
 <body>
