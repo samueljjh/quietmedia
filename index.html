@@ -24,23 +24,11 @@
 }
 .scroll-left { animation: scrollLeft 55s linear infinite; display: flex; align-items: center; width: max-content; }
 .scroll-right { animation: scrollRight 65s linear infinite; display: flex; align-items: center; width: max-content; }
-.scroll-logo { animation: scrollLeft 40s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-logo { animation: scrollLeft 45s linear infinite; display: flex; align-items: center; width: max-content; }
 .client-strip { overflow: hidden; width: 100%; }
 .client-strip:hover .scroll-left,
 .client-strip:hover .scroll-right,
 .client-strip:hover .scroll-logo { animation-play-state: paused; }
-
-.tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
-.tooltip-box {
-  position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);
-  background: rgba(10,10,10,0.96); border: 1px solid rgba(255,255,255,0.1);
-  padding: 10px 14px; white-space: nowrap; pointer-events: none;
-  opacity: 0; transition: opacity 0.2s ease;
-  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
-  color: rgba(255,255,255,0.6); letter-spacing: 0.04em; line-height: 1.5;
-  z-index: 100;
-}
-.tooltip-wrap:hover .tooltip-box { opacity: 1; }
 </style>
 </head>
 <body>
@@ -150,7 +138,6 @@ const HeroSection = ({ onBook }) => {
 // ─── Client Strips ────────────────────────────────────────────
 const ClientStrips = () => {
 
-  // Featured clients — logo strip with tooltips
   const featured = [
     { name: 'Paramount+', slug: 'paramountplus', tooltip: '2 year feature film licensing deal' },
     { name: 'Amazon Prime', slug: 'amazonprime', tooltip: 'Feature film distribution' },
@@ -159,7 +146,7 @@ const ClientStrips = () => {
     { name: 'Volkswagen', slug: 'volkswagen', tooltip: '2 commercial reels · 5M+ reach via Ashley Banjo' },
     { name: 'Tesco', slug: 'tesco', tooltip: 'Fashion show screen visuals · New collection launches' },
     { name: 'M&S', slug: 'marksandspencer', tooltip: 'Fashion show screen visuals · New collection launches' },
-    { name: 'John Lewis', slug: null, tooltip: 'Video content for Sophie Conran\'s sofa & Portmeirion collections' },
+    { name: 'John Lewis', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/John_Lewis_%26_Partners_logo.svg', tooltip: 'Video content for Sophie Conran\'s sofa & Portmeirion collections' },
     { name: 'Dreams', slug: null, tooltip: 'Product launch campaign · £250k first-month sales' },
     { name: 'Sophie Conran', slug: null, tooltip: 'Retained creative partner · 68% revenue increase · 250k→340k followers' },
     { name: 'Pep & Co', slug: null, tooltip: 'Fashion show visuals & commercial production' },
@@ -172,13 +159,11 @@ const ClientStrips = () => {
     { name: 'Aream & Co', slug: null, tooltip: 'Luxury global event production' },
   ];
 
-  // Brand strip — no duplicates from featured
   const brands = [
     'Optical Express', 'F&F', 'UP Clothing', 'Crowcon',
     'David Michael Productions', 'Agency 105', 'Chiswick Cinema', 'Horizon',
   ];
 
-  // Talent strip — no duplicates from featured
   const talent = [
     'Queenz', "Frankie's Guys", 'Louise Dearman', 'Kele Le Roc', 'MAZZA',
     'Zoe Birkett', 'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning',
@@ -188,24 +173,31 @@ const ClientStrips = () => {
   ];
 
   const Dot = () => (
-    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 24px' }} />
+    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 28px' }} />
   );
 
   const FeaturedItem = ({ client }) => {
     const [hovered, setHovered] = React.useState(false);
+    const imgSrc = client.url || (client.slug ? `https://cdn.simpleicons.org/${client.slug}/ffffff` : null);
+
     return (
-      <div className="tooltip-wrap" style={{ padding: '0 28px', flexShrink: 0 }}
+      <div
+        style={{ position: 'relative', padding: '0 48px', flexShrink: 0, display: 'flex', alignItems: 'center' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {client.slug ? (
+        {/* The client name/logo */}
+        {imgSrc ? (
           <img
-            src={`https://cdn.simpleicons.org/${client.slug}/ffffff`}
+            src={imgSrc}
             alt={client.name}
             style={{
-              height: '22px', width: 'auto', maxWidth: '80px',
-              objectFit: 'contain', display: 'block',
-              opacity: hovered ? 0.85 : 0.2,
+              height: '44px',
+              width: 'auto',
+              maxWidth: '120px',
+              objectFit: 'contain',
+              display: 'block',
+              opacity: hovered ? 0.9 : 0.25,
               transition: 'opacity 0.3s ease',
               filter: 'brightness(0) invert(1)',
             }}
@@ -213,14 +205,37 @@ const ClientStrips = () => {
           />
         ) : (
           <span style={{
-            fontSize: '11px', fontWeight: 500, letterSpacing: '0.16em',
+            fontSize: '13px', fontWeight: 500, letterSpacing: '0.12em',
             textTransform: 'uppercase', whiteSpace: 'nowrap',
-            color: hovered ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)',
+            color: hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.25)',
             transition: 'color 0.3s ease',
             fontFamily: "'DM Sans', sans-serif",
           }}>{client.name}</span>
         )}
-        <div className="tooltip-box">{client.tooltip}</div>
+
+        {/* Tooltip — built entirely in React, no CSS classes */}
+        {hovered && (
+          <div style={{
+            position: 'absolute',
+            bottom: 'calc(100% + 14px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(10,10,10,0.97)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '10px 16px',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            zIndex: 200,
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '11px',
+            fontWeight: 300,
+            color: 'rgba(255,255,255,0.65)',
+            letterSpacing: '0.04em',
+            lineHeight: 1.5,
+          }}>
+            {client.tooltip}
+          </div>
+        )}
       </div>
     );
   };
@@ -248,27 +263,19 @@ const ClientStrips = () => {
   return (
     <section style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'var(--bg-primary)' }}>
 
-      <div style={{ padding: '20px clamp(24px,5vw,80px) 0', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.15)', whiteSpace: 'nowrap' }}>TRUSTED BY</span>
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', flex: 1 }} />
-      </div>
-
-      {/* Strip 1 — Featured with logos */}
-      <div style={{ padding: '28px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      {/* Strip 1 — Featured logos — bigger, more spaced */}
+      <div style={{ padding: '36px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="client-strip">
           <div className="scroll-logo">
             {[...featured, ...featured].map((client, i) => (
-              <React.Fragment key={i}>
-                <FeaturedItem client={client} />
-                <span style={{ display: 'inline-block', width: '1px', height: '18px', background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
-              </React.Fragment>
+              <FeaturedItem key={i} client={client} />
             ))}
           </div>
         </div>
       </div>
 
       {/* Strip 2 — Brands & Corporate */}
-      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="client-strip">
           <div className="scroll-left">
             {[...brands, ...brands].map((name, i) => <TextItem key={i} name={name} />)}
@@ -277,7 +284,7 @@ const ClientStrips = () => {
       </div>
 
       {/* Strip 3 — Talent, Arts & Education */}
-      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="client-strip">
           <div className="scroll-right">
             {[...talent, ...talent].map((name, i) => <TextItem key={i} name={name} />)}
@@ -315,16 +322,8 @@ const StatsStrip = () => {
           borderLeft: i > 0 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none',
           display: 'flex', flexDirection: 'column', gap: '8px',
         }}>
-          <span style={{
-            fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300,
-            letterSpacing: '-0.02em', color: 'var(--fg-primary)',
-            lineHeight: 1,
-          }}>{stat.number}</span>
-          <span style={{
-            fontSize: '11px', fontWeight: 400,
-            letterSpacing: '0.08em', color: 'rgba(var(--fg-rgb),0.3)',
-            lineHeight: 1.4, textTransform: 'uppercase',
-          }}>{stat.label}</span>
+          <span style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--fg-primary)', lineHeight: 1 }}>{stat.number}</span>
+          <span style={{ fontSize: '11px', fontWeight: 400, letterSpacing: '0.08em', color: 'rgba(var(--fg-rgb),0.3)', lineHeight: 1.4, textTransform: 'uppercase' }}>{stat.label}</span>
         </div>
       ))}
     </section>
@@ -335,21 +334,9 @@ const StatsStrip = () => {
 const TestimonialsSection = () => {
   useReveal();
   const testimonials = [
-    {
-      quote: "Testimonial coming soon.",
-      name: 'Sophie Conran',
-      role: 'Designer & Entrepreneur',
-    },
-    {
-      quote: "Testimonial coming soon.",
-      name: 'Ashley Banjo MBE',
-      role: 'Founder, Diversity · Soul Tour 2026',
-    },
-    {
-      quote: "Testimonial coming soon.",
-      name: 'International Collective',
-      role: 'Creative Production Partner · 5 years',
-    },
+    { quote: 'Testimonial coming soon.', name: 'Sophie Conran', role: 'Designer & Entrepreneur' },
+    { quote: 'Testimonial coming soon.', name: 'Ashley Banjo MBE', role: 'Founder, Diversity · Soul Tour 2026' },
+    { quote: 'Testimonial coming soon.', name: 'International Collective', role: 'Creative Production Partner · 5 years' },
   ];
 
   return (
@@ -478,7 +465,7 @@ const PortfolioSection = () => {
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
     },
     {
-      title: 'Hellfire the movie',
+      title: 'Hellfire the Film',
       type: 'FILM PROJECT',
       year: '2023',
       detail: 'Quiet Media production',
@@ -596,7 +583,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
       role: 'Producer & Co-founder',
       src: 'assets/tamy.jpg',
       bio: "Tamy is the connective tissue of every project — the person who makes sure vision translates to reality, on schedule, and within budget. Her warmth and professionalism put clients at ease from first call to final delivery.",
-      detail: 'Specialises in production management and post-production.
+      detail: 'Specialises in production management, client relationships, and post-production coordination. Passionate about working with artists, brands and performers to help them present their best work.',
     },
   ];
 
