@@ -22,20 +22,22 @@
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
 }
-.scroll-left { animation: scrollLeft 55s linear infinite; display: flex; align-items: center; width: max-content; }
-.scroll-right { animation: scrollRight 65s linear infinite; display: flex; align-items: center; width: max-content; }
-.scroll-logo { animation: scrollLeft 45s linear infinite; display: flex; align-items: center; width: max-content; }
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.scroll-track-left { animation: scrollLeft 60s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-track-right { animation: scrollRight 70s linear infinite; display: flex; align-items: center; width: max-content; }
 .client-strip { overflow: hidden; width: 100%; }
-.client-strip:hover .scroll-left,
-.client-strip:hover .scroll-right,
-.client-strip:hover .scroll-logo { animation-play-state: paused; }
-.featured-item { position: relative; padding: 0 48px; flex-shrink: 0; display: inline-flex; align-items: center; cursor: default; }
-.featured-item img { height: 44px; width: auto; max-width: 120px; object-fit: contain; display: block; opacity: 0.25; transition: opacity 0.3s ease; filter: brightness(0) invert(1); }
-.featured-item span.logo-text { font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; color: rgba(255,255,255,0.25); transition: color 0.3s ease; font-family: 'DM Sans', sans-serif; }
-.featured-item .logo-tooltip { position: absolute; bottom: calc(100% + 14px); left: 50%; transform: translateX(-50%); background: rgba(10,10,10,0.97); border: 1px solid rgba(255,255,255,0.1); padding: 10px 16px; white-space: nowrap; pointer-events: none; z-index: 200; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300; color: rgba(255,255,255,0.65); letter-spacing: 0.04em; line-height: 1.5; opacity: 0; transition: opacity 0.2s ease; }
-.featured-item:hover img { opacity: 0.9; }
-.featured-item:hover span.logo-text { color: rgba(255,255,255,0.9); }
-.featured-item:hover .logo-tooltip { opacity: 1; }
+.client-strip:hover .scroll-track-left,
+.client-strip:hover .scroll-track-right { animation-play-state: paused; }
+.stat-item { opacity: 0; transform: translateY(16px); }
+.stat-item.visible { animation: countUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+.stat-item.visible:nth-child(1) { animation-delay: 0s; }
+.stat-item.visible:nth-child(2) { animation-delay: 0.1s; }
+.stat-item.visible:nth-child(3) { animation-delay: 0.2s; }
+.stat-item.visible:nth-child(4) { animation-delay: 0.3s; }
+.stat-item.visible:nth-child(5) { animation-delay: 0.4s; }
 </style>
 </head>
 <body>
@@ -144,118 +146,137 @@ const HeroSection = ({ onBook }) => {
 
 // ─── Client Strips ────────────────────────────────────────────
 const ClientStrips = () => {
+  const theme = document.documentElement.getAttribute('data-theme');
+  const isDark = theme !== 'light';
+  const fgColor = isDark ? 'rgba(255,255,255,VAL)' : 'rgba(0,0,0,VAL)';
+  const logoFilter = isDark ? 'brightness(0) invert(1)' : 'brightness(0)';
 
-  const featured = [
-    { name: 'Paramount+', slug: 'paramountplus', tooltip: '2 year feature film licensing deal' },
-    { name: 'Amazon Prime', slug: 'amazonprime', tooltip: 'Feature film distribution' },
-    { name: 'Sky', slug: 'sky', tooltip: 'Feature film distribution · Sky Store' },
-    { name: 'Apple TV', slug: 'appletv', tooltip: 'Feature film distribution' },
-    { name: 'Volkswagen', slug: 'volkswagen', tooltip: '2 commercial reels · 5M+ reach via Ashley Banjo' },
-    { name: 'Tesco', slug: 'tesco', tooltip: 'Fashion show screen visuals · New collection launches' },
-    { name: 'M&S', slug: 'marksandspencer', tooltip: 'Fashion show screen visuals · New collection launches' },
-    { name: 'John Lewis', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/John_Lewis_%26_Partners_logo.svg', tooltip: "Video content for Sophie Conran's sofa & Portmeirion collections" },
-    { name: 'Dreams', slug: null, tooltip: 'Product launch campaign · £250k first-month sales' },
-    { name: 'Sophie Conran', slug: null, tooltip: 'Retained creative partner · 68% revenue increase · 250k→340k followers' },
-    { name: 'Pep & Co', slug: null, tooltip: 'Fashion show visuals & commercial production' },
-    { name: 'Diversity', slug: null, tooltip: '8 films · 100,000+ live audience on Soul Tour' },
-    { name: 'Ashley Banjo', slug: null, tooltip: 'Soul Tour films · Volkswagen commercial · 5M+ reach' },
-    { name: 'Junior Eurovision', slug: null, tooltip: 'Screen visuals for Cypriot artist · International broadcast' },
-    { name: 'Move It', slug: null, tooltip: 'Exclusive filming partner · 100+ performances over 5 years' },
-    { name: 'International Collective', slug: null, tooltip: 'Exclusive production partner · 5 years' },
-    { name: 'Six Senses', slug: null, tooltip: 'Luxury event promo · Multi-million pound buyout' },
-    { name: 'Aream & Co', slug: null, tooltip: 'Luxury global event production' },
+  // Strip 1 — mix of big brands + artists, scrolling left
+  const strip1 = [
+    { type: 'logo', slug: 'paramountplus', name: 'Paramount+' },
+    { type: 'text', name: 'Diversity' },
+    { type: 'logo', slug: 'amazonprime', name: 'Amazon Prime' },
+    { type: 'text', name: 'Louise Dearman' },
+    { type: 'logo', slug: 'sky', name: 'Sky' },
+    { type: 'text', name: 'Ashley Banjo' },
+    { type: 'logo', slug: 'appletv', name: 'Apple TV' },
+    { type: 'text', name: 'Move It' },
+    { type: 'logo', slug: 'volkswagen', name: 'Volkswagen' },
+    { type: 'text', name: 'Junior Eurovision' },
+    { type: 'logo', slug: 'tesco', name: 'Tesco' },
+    { type: 'text', name: 'Kele Le Roc' },
+    { type: 'logo', slug: 'marksandspencer', name: 'M&S' },
+    { type: 'text', name: 'Queenz' },
+    { type: 'url', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/John_Lewis_%26_Partners_logo.svg', name: 'John Lewis' },
+    { type: 'text', name: 'Zoe Birkett' },
+    { type: 'text', name: 'Sophie Conran' },
+    { type: 'text', name: "Frankie's Guys" },
+    { type: 'text', name: 'International Collective' },
+    { type: 'text', name: 'MAZZA' },
   ];
 
-  const brands = [
-    'Optical Express', 'F&F', 'UP Clothing', 'Crowcon',
-    'David Michael Productions', 'Agency 105', 'Chiswick Cinema', 'Horizon',
-  ];
-
-  const talent = [
-    'Queenz', "Frankie's Guys", 'Louise Dearman', 'Kele Le Roc', 'MAZZA',
-    'Zoe Birkett', 'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning',
-    'Chris Manoe', 'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle',
-    'Wilkes Academy', 'Performers College', 'The Hammond', 'Shockout Arts',
-    'McLaren Dance Company', 'Tap Attack', 'Diverse Dubai',
+  // Strip 2 — mix of fashion, corporate, performing arts, scrolling right
+  const strip2 = [
+    { type: 'text', name: 'Dreams' },
+    { type: 'text', name: 'Wilkes Academy' },
+    { type: 'text', name: 'Pep & Co' },
+    { type: 'text', name: 'Performers College' },
+    { type: 'text', name: 'Six Senses' },
+    { type: 'text', name: 'The Hammond' },
+    { type: 'text', name: 'Aream & Co' },
+    { type: 'text', name: 'Shockout Arts' },
+    { type: 'text', name: 'F&F' },
+    { type: 'text', name: 'McLaren Dance Company' },
+    { type: 'text', name: 'Optical Express' },
+    { type: 'text', name: 'Tap Attack' },
+    { type: 'text', name: 'Crowcon' },
+    { type: 'text', name: 'Diverse Dubai' },
+    { type: 'text', name: 'David Michael Productions' },
+    { type: 'text', name: 'Some Velvet Morning' },
+    { type: 'text', name: 'Agency 105' },
+    { type: 'text', name: 'Chris Manoe' },
+    { type: 'text', name: 'Chiswick Cinema' },
+    { type: 'text', name: 'Singers Inc.' },
+    { type: 'text', name: 'Horizon' },
+    { type: 'text', name: 'Dancers Inc.' },
+    { type: 'text', name: 'UP Clothing' },
+    { type: 'text', name: 'The Circle' },
+    { type: 'text', name: 'Sam Stanley' },
+    { type: 'text', name: 'Maria Pissarides' },
+    { type: 'text', name: 'Mez and the Fezzes' },
   ];
 
   const Dot = () => (
-    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 28px' }} />
+    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)', flexShrink: 0, margin: '0 28px' }} />
   );
 
-  const FeaturedItem = ({ client }) => {
-    const imgSrc = client.url || (client.slug ? `https://cdn.simpleicons.org/${client.slug}/ffffff` : null);
+  const StripItem = ({ item }) => {
+    const [hovered, setHovered] = React.useState(false);
+    const imgSrc = item.type === 'logo' ? `https://cdn.simpleicons.org/${item.slug}/ffffff` : item.url;
+    const isImg = item.type === 'logo' || item.type === 'url';
+    const dimColor = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.3)';
+    const brightColor = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)';
+
     return (
-      <div className="featured-item">
-        {imgSrc ? (
-          <img src={imgSrc} alt={client.name} onError={e => { e.target.style.display = 'none'; }} />
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 44px' : '0 4px', flexShrink: 0 }}
+      >
+        {isImg ? (
+          <img
+            src={imgSrc}
+            alt={item.name}
+            style={{ height: '40px', width: 'auto', maxWidth: '110px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
+            onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: item.name, style: `font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;color:${dimColor};font-family:'DM Sans',sans-serif` })); }}
+          />
         ) : (
-          <span className="logo-text">{client.name}</span>
+          <span style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', whiteSpace: 'nowrap', color: hovered ? brightColor : dimColor, transition: 'color 0.25s ease', fontFamily: "'DM Sans', sans-serif" }}>
+            {item.name}
+          </span>
         )}
-        <div className="logo-tooltip">{client.tooltip}</div>
+        {!isImg && <Dot />}
       </div>
     );
   };
 
-  const TextItem = ({ name }) => {
-    const [hovered, setHovered] = React.useState(false);
-    return (
-      <>
-        <span
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-          style={{
-            fontSize: '10px', fontWeight: 500, letterSpacing: '0.2em',
-            textTransform: 'uppercase', whiteSpace: 'nowrap',
-            color: hovered ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.22)',
-            transition: 'color 0.25s ease', cursor: 'default',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >{name}</span>
-        <Dot />
-      </>
-    );
-  };
+  const renderStrip = (items) => [...items, ...items].map((item, i) => <StripItem key={i} item={item} />);
 
   return (
-    <section style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'var(--bg-primary)' }}>
-
-      {/* Strip 1 — Featured logos */}
-      <div style={{ padding: '36px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0' }}>
+      <div style={{ padding: '32px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
         <div className="client-strip">
-          <div className="scroll-logo">
-            {[...featured, ...featured].map((client, i) => (
-              <FeaturedItem key={i} client={client} />
-            ))}
+          <div className="scroll-track-left" style={{ gap: '0' }}>
+            {renderStrip(strip1)}
           </div>
         </div>
       </div>
-
-      {/* Strip 2 — Brands & Corporate */}
-      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div style={{ padding: '20px 0' }}>
         <div className="client-strip">
-          <div className="scroll-left">
-            {[...brands, ...brands].map((name, i) => <TextItem key={i} name={name} />)}
+          <div className="scroll-track-right" style={{ gap: '0' }}>
+            {renderStrip(strip2)}
           </div>
         </div>
       </div>
-
-      {/* Strip 3 — Talent, Arts & Education */}
-      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="client-strip">
-          <div className="scroll-right">
-            {[...talent, ...talent].map((name, i) => <TextItem key={i} name={name} />)}
-          </div>
-        </div>
-      </div>
-
     </section>
   );
 };
 
 // ─── Stats Strip ──────────────────────────────────────────────
 const StatsStrip = () => {
-  useReveal();
+  const ref = React.useRef(null);
+  const [visible, setVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   const stats = [
     { number: '10M+', label: 'Online views generated' },
     { number: '100k+', label: 'Live audience' },
@@ -265,22 +286,23 @@ const StatsStrip = () => {
   ];
 
   return (
-    <section className="reveal" style={{
-      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
-      borderBottom: '1px solid rgba(var(--fg-rgb),0.06)',
+    <section ref={ref} style={{
+      background: '#EDECE8',
+      borderTop: '1px solid rgba(10,10,10,0.08)',
+      borderBottom: '1px solid rgba(10,10,10,0.08)',
       padding: 'clamp(48px,7vw,88px) clamp(24px,5vw,80px)',
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
       gap: '2px',
     }}>
       {stats.map((stat, i) => (
-        <div key={i} style={{
-          padding: 'clamp(24px,3vw,36px)',
-          borderLeft: i > 0 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none',
+        <div key={i} className={`stat-item${visible ? ' visible' : ''}`} style={{
+          padding: 'clamp(20px,3vw,32px)',
+          borderLeft: i > 0 ? '1px solid rgba(10,10,10,0.08)' : 'none',
           display: 'flex', flexDirection: 'column', gap: '8px',
         }}>
-          <span style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--fg-primary)', lineHeight: 1 }}>{stat.number}</span>
-          <span style={{ fontSize: '11px', fontWeight: 400, letterSpacing: '0.08em', color: 'rgba(var(--fg-rgb),0.3)', lineHeight: 1.4, textTransform: 'uppercase' }}>{stat.label}</span>
+          <span style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, letterSpacing: '-0.02em', color: '#0A0A0A', lineHeight: 1 }}>{stat.number}</span>
+          <span style={{ fontSize: '11px', fontWeight: 400, letterSpacing: '0.08em', color: 'rgba(10,10,10,0.4)', lineHeight: 1.4, textTransform: 'uppercase' }}>{stat.label}</span>
         </div>
       ))}
     </section>
