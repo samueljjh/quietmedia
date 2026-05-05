@@ -22,13 +22,25 @@
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
 }
-.scroll-left { animation: scrollLeft 50s linear infinite; display: flex; align-items: center; width: max-content; }
-.scroll-right { animation: scrollRight 60s linear infinite; display: flex; align-items: center; width: max-content; }
-.scroll-logo { animation: scrollLeft 35s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-left { animation: scrollLeft 55s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-right { animation: scrollRight 65s linear infinite; display: flex; align-items: center; width: max-content; }
+.scroll-logo { animation: scrollLeft 40s linear infinite; display: flex; align-items: center; width: max-content; }
 .client-strip { overflow: hidden; width: 100%; }
 .client-strip:hover .scroll-left,
 .client-strip:hover .scroll-right,
 .client-strip:hover .scroll-logo { animation-play-state: paused; }
+
+.tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+.tooltip-box {
+  position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);
+  background: rgba(10,10,10,0.96); border: 1px solid rgba(255,255,255,0.1);
+  padding: 10px 14px; white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.2s ease;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 300;
+  color: rgba(255,255,255,0.6); letter-spacing: 0.04em; line-height: 1.5;
+  z-index: 100;
+}
+.tooltip-wrap:hover .tooltip-box { opacity: 1; }
 </style>
 </head>
 <body>
@@ -138,59 +150,78 @@ const HeroSection = ({ onBook }) => {
 // ─── Client Strips ────────────────────────────────────────────
 const ClientStrips = () => {
 
-  const logoClients = [
-    { name: 'PARAMOUNT+', style: { fontSize: '15px', fontWeight: 600, letterSpacing: '0.05em' } },
-    { name: 'AMAZON PRIME', style: { fontSize: '13px', fontWeight: 500, letterSpacing: '0.08em' } },
-    { name: 'JOHN LEWIS', style: { fontSize: '13px', fontWeight: 400, letterSpacing: '0.12em' } },
-    { name: 'TESCO', style: { fontSize: '16px', fontWeight: 700, letterSpacing: '0.06em' } },
-    { name: 'M&S', style: { fontSize: '16px', fontWeight: 700, letterSpacing: '0.08em' } },
-    { name: 'DREAMS', style: { fontSize: '15px', fontWeight: 600, letterSpacing: '0.1em' } },
-    { name: 'SOPHIE CONRAN', style: { fontSize: '12px', fontWeight: 300, letterSpacing: '0.18em' } },
-    { name: 'PEP & CO', style: { fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em' } },
-    { name: 'DIVERSITY', style: { fontSize: '14px', fontWeight: 700, letterSpacing: '0.12em' } },
-    { name: 'ASHLEY BANJO', style: { fontSize: '13px', fontWeight: 400, letterSpacing: '0.1em' } },
-    { name: 'JUNIOR EUROVISION', style: { fontSize: '11px', fontWeight: 500, letterSpacing: '0.1em' } },
-    { name: 'MOVE IT', style: { fontSize: '15px', fontWeight: 700, letterSpacing: '0.06em' } },
-    { name: 'INTERNATIONAL COLLECTIVE', style: { fontSize: '10px', fontWeight: 500, letterSpacing: '0.15em' } },
-    { name: 'SIX SENSES', style: { fontSize: '13px', fontWeight: 300, letterSpacing: '0.22em' } },
-    { name: 'AREAM & CO', style: { fontSize: '13px', fontWeight: 500, letterSpacing: '0.12em' } },
+  // Featured clients — logo strip with tooltips
+  const featured = [
+    { name: 'Paramount+', slug: 'paramountplus', tooltip: '2 year feature film licensing deal' },
+    { name: 'Amazon Prime', slug: 'amazonprime', tooltip: 'Feature film distribution' },
+    { name: 'Sky', slug: 'sky', tooltip: 'Feature film distribution · Sky Store' },
+    { name: 'Apple TV', slug: 'appletv', tooltip: 'Feature film distribution' },
+    { name: 'Volkswagen', slug: 'volkswagen', tooltip: '2 commercial reels · 5M+ reach via Ashley Banjo' },
+    { name: 'Tesco', slug: 'tesco', tooltip: 'Fashion show screen visuals · New collection launches' },
+    { name: 'M&S', slug: 'marksandspencer', tooltip: 'Fashion show screen visuals · New collection launches' },
+    { name: 'John Lewis', slug: null, tooltip: 'Video content for Sophie Conran\'s sofa & Portmeirion collections' },
+    { name: 'Dreams', slug: null, tooltip: 'Product launch campaign · £250k first-month sales' },
+    { name: 'Sophie Conran', slug: null, tooltip: 'Retained creative partner · 68% revenue increase · 250k→340k followers' },
+    { name: 'Pep & Co', slug: null, tooltip: 'Fashion show visuals & commercial production' },
+    { name: 'Diversity', slug: null, tooltip: '8 films · 100,000+ live audience on Soul Tour' },
+    { name: 'Ashley Banjo', slug: null, tooltip: 'Soul Tour films · Volkswagen commercial · 5M+ reach' },
+    { name: 'Junior Eurovision', slug: null, tooltip: 'Screen visuals for Cypriot artist · International broadcast' },
+    { name: 'Move It', slug: null, tooltip: 'Exclusive filming partner · 100+ performances over 5 years' },
+    { name: 'International Collective', slug: null, tooltip: 'Exclusive production partner · 5 years' },
+    { name: 'Six Senses', slug: null, tooltip: 'Luxury event promo · Multi-million pound buyout' },
+    { name: 'Aream & Co', slug: null, tooltip: 'Luxury global event production' },
   ];
 
-  const brandClients = [
-    'Tesco', 'M&S', 'John Lewis', 'Dreams', 'Optical Express', 'F&F', 'Pep & Co',
-    'Sophie Conran', 'Six Senses', 'Crowcon', 'Aream & Co', 'International Collective',
+  // Brand strip — no duplicates from featured
+  const brands = [
+    'Optical Express', 'F&F', 'UP Clothing', 'Crowcon',
     'David Michael Productions', 'Agency 105', 'Chiswick Cinema', 'Horizon',
   ];
 
-  const talentClients = [
-    'Diversity', 'Ashley Banjo', 'Junior Eurovision', 'Queenz', "Frankie's Guys",
-    'Move It', 'Louise Dearman', 'Kele Le Roc', 'MAZZA', 'Zoe Birkett',
-    'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning', 'Chris Manoe',
-    'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle', 'UP Clothing',
+  // Talent strip — no duplicates from featured
+  const talent = [
+    'Queenz', "Frankie's Guys", 'Louise Dearman', 'Kele Le Roc', 'MAZZA',
+    'Zoe Birkett', 'Maria Pissarides', 'Mez and the Fezzes', 'Some Velvet Morning',
+    'Chris Manoe', 'Sam Stanley', 'Singers Inc.', 'Dancers Inc.', 'The Circle',
     'Wilkes Academy', 'Performers College', 'The Hammond', 'Shockout Arts',
     'McLaren Dance Company', 'Tap Attack', 'Diverse Dubai',
   ];
 
   const Dot = () => (
-    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.12)', flexShrink: 0, margin: '0 28px' }} />
+    <span style={{ display: 'inline-block', width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', flexShrink: 0, margin: '0 24px' }} />
   );
 
-  const LogoItem = ({ client }) => {
+  const FeaturedItem = ({ client }) => {
     const [hovered, setHovered] = React.useState(false);
     return (
-      <span
+      <div className="tooltip-wrap" style={{ padding: '0 28px', flexShrink: 0 }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{
-          ...client.style,
-          color: hovered ? 'rgba(var(--fg-rgb),0.9)' : 'rgba(var(--fg-rgb),0.22)',
-          transition: 'color 0.3s ease',
-          whiteSpace: 'nowrap',
-          padding: '0 36px',
-          cursor: 'default',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >{client.name}</span>
+      >
+        {client.slug ? (
+          <img
+            src={`https://cdn.simpleicons.org/${client.slug}/ffffff`}
+            alt={client.name}
+            style={{
+              height: '22px', width: 'auto', maxWidth: '80px',
+              objectFit: 'contain', display: 'block',
+              opacity: hovered ? 0.85 : 0.2,
+              transition: 'opacity 0.3s ease',
+              filter: 'brightness(0) invert(1)',
+            }}
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        ) : (
+          <span style={{
+            fontSize: '11px', fontWeight: 500, letterSpacing: '0.16em',
+            textTransform: 'uppercase', whiteSpace: 'nowrap',
+            color: hovered ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)',
+            transition: 'color 0.3s ease',
+            fontFamily: "'DM Sans', sans-serif",
+          }}>{client.name}</span>
+        )}
+        <div className="tooltip-box">{client.tooltip}</div>
+      </div>
     );
   };
 
@@ -204,7 +235,7 @@ const ClientStrips = () => {
           style={{
             fontSize: '10px', fontWeight: 500, letterSpacing: '0.2em',
             textTransform: 'uppercase', whiteSpace: 'nowrap',
-            color: hovered ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.25)',
+            color: hovered ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.22)',
             transition: 'color 0.25s ease', cursor: 'default',
             fontFamily: "'DM Sans', sans-serif",
           }}
@@ -215,22 +246,21 @@ const ClientStrips = () => {
   };
 
   return (
-    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)' }}>
+    <section style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'var(--bg-primary)' }}>
 
-      {/* Label */}
       <div style={{ padding: '20px clamp(24px,5vw,80px) 0', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.18)', whiteSpace: 'nowrap' }}>TRUSTED BY</span>
-        <div style={{ height: '1px', background: 'rgba(var(--fg-rgb),0.06)', flex: 1 }} />
+        <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.15)', whiteSpace: 'nowrap' }}>TRUSTED BY</span>
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', flex: 1 }} />
       </div>
 
-      {/* Strip 1 — Featured logos */}
-      <div style={{ padding: '24px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
+      {/* Strip 1 — Featured with logos */}
+      <div style={{ padding: '28px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="client-strip">
           <div className="scroll-logo">
-            {[...logoClients, ...logoClients].map((client, i) => (
+            {[...featured, ...featured].map((client, i) => (
               <React.Fragment key={i}>
-                <LogoItem client={client} />
-                <span style={{ display: 'inline-block', width: '1px', height: '16px', background: 'rgba(var(--fg-rgb),0.08)', flexShrink: 0 }} />
+                <FeaturedItem client={client} />
+                <span style={{ display: 'inline-block', width: '1px', height: '18px', background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
               </React.Fragment>
             ))}
           </div>
@@ -238,27 +268,65 @@ const ClientStrips = () => {
       </div>
 
       {/* Strip 2 — Brands & Corporate */}
-      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.04)' }}>
+      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="client-strip">
           <div className="scroll-left">
-            {[...brandClients, ...brandClients].map((name, i) => (
-              <TextItem key={i} name={name} />
-            ))}
+            {[...brands, ...brands].map((name, i) => <TextItem key={i} name={name} />)}
           </div>
         </div>
       </div>
 
       {/* Strip 3 — Talent, Arts & Education */}
-      <div style={{ padding: '16px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="client-strip">
           <div className="scroll-right">
-            {[...talentClients, ...talentClients].map((name, i) => (
-              <TextItem key={i} name={name} />
-            ))}
+            {[...talent, ...talent].map((name, i) => <TextItem key={i} name={name} />)}
           </div>
         </div>
       </div>
 
+    </section>
+  );
+};
+
+// ─── Stats Strip ──────────────────────────────────────────────
+const StatsStrip = () => {
+  useReveal();
+  const stats = [
+    { number: '10M+', label: 'Online views generated' },
+    { number: '100k+', label: 'Live audience' },
+    { number: '5', label: 'Major streaming platforms' },
+    { number: '40+', label: 'Clients worldwide' },
+    { number: 'Multi-million', label: 'Pound impact for clients' },
+  ];
+
+  return (
+    <section className="reveal" style={{
+      borderTop: '1px solid rgba(var(--fg-rgb),0.06)',
+      borderBottom: '1px solid rgba(var(--fg-rgb),0.06)',
+      padding: 'clamp(48px,7vw,88px) clamp(24px,5vw,80px)',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gap: '2px',
+    }}>
+      {stats.map((stat, i) => (
+        <div key={i} style={{
+          padding: 'clamp(24px,3vw,36px)',
+          borderLeft: i > 0 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none',
+          display: 'flex', flexDirection: 'column', gap: '8px',
+        }}>
+          <span style={{
+            fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300,
+            letterSpacing: '-0.02em', color: 'var(--fg-primary)',
+            lineHeight: 1,
+          }}>{stat.number}</span>
+          <span style={{
+            fontSize: '11px', fontWeight: 400,
+            letterSpacing: '0.08em', color: 'rgba(var(--fg-rgb),0.3)',
+            lineHeight: 1.4, textTransform: 'uppercase',
+          }}>{stat.label}</span>
+        </div>
+      ))}
     </section>
   );
 };
@@ -268,19 +336,19 @@ const TestimonialsSection = () => {
   useReveal();
   const testimonials = [
     {
-      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      quote: "Testimonial coming soon.",
       name: 'Sophie Conran',
       role: 'Designer & Entrepreneur',
     },
     {
-      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      quote: "Testimonial coming soon.",
       name: 'Ashley Banjo MBE',
       role: 'Founder, Diversity · Soul Tour 2026',
     },
     {
-      quote: "Quote coming soon — we're collecting testimonials from our clients.",
+      quote: "Testimonial coming soon.",
       name: 'International Collective',
-      role: 'Creative Production Partner',
+      role: 'Creative Production Partner · 5 years',
     },
   ];
 
@@ -288,15 +356,13 @@ const TestimonialsSection = () => {
     <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-secondary)' }}>
       <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
         <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '16px' }}>WHAT CLIENTS SAY</p>
-        <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>
-          In their own words.
-        </h2>
+        <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>In their own words.</h2>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2px' }}>
         {testimonials.map((t, i) => (
           <div key={i} className="reveal" style={{ background: 'var(--bg-primary)', padding: 'clamp(28px,4vw,44px)', borderTop: '1px solid rgba(var(--fg-rgb),0.08)' }}>
-            <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.18)', letterSpacing: '0.3em', marginBottom: '20px' }}>❝</p>
-            <p style={{ fontSize: 'clamp(14px,1.5vw,17px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.55)', lineHeight: 1.8, marginBottom: '28px', fontStyle: 'italic', textWrap: 'pretty' }}>{t.quote}</p>
+            <p style={{ fontSize: '28px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.12)', marginBottom: '20px', lineHeight: 1 }}>❝</p>
+            <p style={{ fontSize: 'clamp(14px,1.5vw,16px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.8, marginBottom: '28px', fontStyle: 'italic', textWrap: 'pretty' }}>{t.quote}</p>
             <div style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.07)', paddingTop: '16px' }}>
               <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--fg-primary)', marginBottom: '4px' }}>{t.name}</p>
               <p style={{ fontSize: '11px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.3)', letterSpacing: '0.05em' }}>{t.role}</p>
@@ -402,13 +468,13 @@ const PortfolioSection = () => {
       type: 'SHORT FILM SERIES',
       year: '2026',
       detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
-      quote: 'Films exploring humanity and human connection in a world full of AI.',
+      quote: 'Films exploring humanity and human connection in a world full of AI — played on LED screens to 100,000+ people live.',
     },
     {
       title: 'Look to the Light',
       type: 'FEATURE FILM',
       year: '2023',
-      detail: 'Director of Photography & Producer · Available on Amazon Prime',
+      detail: 'Director of Photography & Producer · Paramount+ · Amazon Prime · Sky Store · Apple TV · YouTube',
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
     },
     {
@@ -607,6 +673,7 @@ const App = () => {
           <>
             <HeroSection onBook={openBook} />
             <ClientStrips />
+            <StatsStrip />
             <AboutSection />
             <ServicesSection />
             <PortfolioSection />
