@@ -14,6 +14,14 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
 
   const handleNav = (id) => { setMenuOpen(false); onNavigate(id); };
 
+  // Key logic — on hero (not scrolled) always use white text regardless of theme
+  // Once scrolled, follow the theme
+  const onHero = currentPage === 'home' && !scrolled;
+  const navTextColor = onHero ? 'rgba(255,255,255,VAL)' : 'var(--fg-primary)';
+  const navBg = scrolled || menuOpen
+    ? `rgba(var(--bg-rgb),0.97)`
+    : 'transparent';
+
   const navItems = [
     { id: 'home', label: 'HOME' },
     { id: 'work', label: 'OUR WORK' },
@@ -24,7 +32,8 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
   const ThemeToggle = () => (
     <button onClick={onToggleTheme} aria-label="Toggle theme" style={{
       background: 'none', border: 'none', cursor: 'pointer', padding: '6px',
-      color: 'var(--fg-primary)', opacity: 0.45,
+      color: onHero ? 'rgba(255,255,255,0.6)' : 'var(--fg-primary)',
+      opacity: 0.45,
       display: 'flex', alignItems: 'center',
       transition: 'opacity 0.2s',
     }}
@@ -54,7 +63,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
   const headerStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
     height: scrolled ? '56px' : '68px',
-    background: scrolled || menuOpen ? `rgba(var(--bg-rgb),0.97)` : 'transparent',
+    background: navBg,
     backdropFilter: scrolled || menuOpen ? 'blur(16px)' : 'none',
     borderBottom: scrolled ? '1px solid rgba(var(--fg-rgb),0.07)' : '1px solid transparent',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -70,10 +79,12 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', gap: '10px', zIndex: 201,
         }}>
-          <QMark size={20} />
+          <QMark size={20} color={onHero ? '#ffffff' : 'var(--fg-primary)'} />
           <span style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: '15px', fontWeight: 300, letterSpacing: '-0.01em', color: 'var(--fg-primary)',
+            fontSize: '15px', fontWeight: 300, letterSpacing: '-0.01em',
+            color: onHero ? '#ffffff' : 'var(--fg-primary)',
+            transition: 'color 0.3s ease',
           }}>quiet media</span>
         </button>
 
@@ -85,10 +96,14 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '10px', fontWeight: 500,
                 letterSpacing: '0.24em', textTransform: 'uppercase',
-                color: currentPage === item.id ? 'var(--fg-primary)' : `rgba(var(--fg-rgb),0.4)`,
+                color: onHero
+                  ? currentPage === item.id ? '#ffffff' : 'rgba(255,255,255,0.5)'
+                  : currentPage === item.id ? 'var(--fg-primary)' : `rgba(var(--fg-rgb),0.4)`,
                 background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                transition: 'color 0.25s ease',
-                borderBottom: currentPage === item.id ? `1px solid rgba(var(--fg-rgb),0.45)` : '1px solid transparent',
+                transition: 'color 0.3s ease',
+                borderBottom: currentPage === item.id
+                  ? onHero ? '1px solid rgba(255,255,255,0.5)' : `1px solid rgba(var(--fg-rgb),0.45)`
+                  : '1px solid transparent',
                 paddingBottom: '2px',
               }}>{item.label}</button>
             ))}
@@ -96,8 +111,9 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
             <button onClick={() => onNavigate('book')} style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'var(--bg-primary)', background: 'var(--fg-primary)', border: 'none',
-              padding: '10px 22px', cursor: 'pointer', transition: 'opacity 0.2s ease',
+              color: onHero ? '#0A0A0A' : 'var(--bg-primary)',
+              background: onHero ? '#ffffff' : 'var(--fg-primary)',
+              border: 'none', padding: '10px 22px', cursor: 'pointer', transition: 'opacity 0.2s ease',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -113,9 +129,15 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
               background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
               display: 'flex', flexDirection: 'column', gap: '5px',
             }}>
-              <span style={{ display: 'block', width: '22px', height: '1px', background: 'var(--fg-primary)', transition: 'transform 0.3s, opacity 0.3s', transform: menuOpen ? 'translateY(6px) rotate(45deg)' : 'none' }} />
-              <span style={{ display: 'block', width: '22px', height: '1px', background: 'var(--fg-primary)', transition: 'opacity 0.3s', opacity: menuOpen ? 0 : 1 }} />
-              <span style={{ display: 'block', width: '22px', height: '1px', background: 'var(--fg-primary)', transition: 'transform 0.3s, opacity 0.3s', transform: menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none' }} />
+              {[0,1,2].map(i => (
+                <span key={i} style={{
+                  display: 'block', width: '22px', height: '1px',
+                  background: onHero ? '#ffffff' : 'var(--fg-primary)',
+                  transition: 'transform 0.3s, opacity 0.3s',
+                  transform: i === 0 && menuOpen ? 'translateY(6px) rotate(45deg)' : i === 2 && menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none',
+                  opacity: i === 1 && menuOpen ? 0 : 1,
+                }} />
+              ))}
             </button>
           </div>
         )}
