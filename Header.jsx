@@ -16,7 +16,8 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
 
   // Key logic — on hero (not scrolled) always use white text regardless of theme
   // Once scrolled, follow the theme
-  const onHero = currentPage === 'home' && !scrolled;
+const onHero = currentPage === 'home' && !scrolled && true; // theme dependency: theme
+const forceWhite = currentPage === 'home' && !scrolled;
   const navTextColor = onHero ? 'rgba(255,255,255,VAL)' : 'var(--fg-primary)';
   const navBg = scrolled || menuOpen
     ? `rgba(var(--bg-rgb),0.97)`
