@@ -22,7 +22,6 @@ const BookingModal = ({ isOpen, onClose }) => {
   const callTypes = [
     { id: 'general', label: 'General Enquiry', desc: 'Tell us about your project and explore how we can help.' },
     { id: 'corporate', label: 'Corporate Video', desc: 'Brand films, talking heads, social content and events.' },
-    { id: 'showreel', label: 'Showreel', desc: 'Dance, drama and performance reels for performers.' },
     { id: 'film', label: 'Film Production', desc: 'Narrative, dramatic and feature-length projects.' },
   ];
 
