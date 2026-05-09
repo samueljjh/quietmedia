@@ -654,9 +654,13 @@ const SoulFilmStrip = () => {
 
   return (
     <>
-      <div
-        ref={stripRef}
-        style={{ overflow: 'hidden', width: '100%', margin: '40px 0', cursor: 'grab', userSelect: 'none' }}
+     <div
+  ref={stripRef}
+  style={{
+    overflow: 'hidden', width: '100%', margin: '40px 0', cursor: 'grab', userSelect: 'none',
+    maskImage: 'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+  }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseDown={onMouseDown}
