@@ -14,7 +14,7 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
-  @keyframes fadeIn {
+@keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -29,10 +29,6 @@
 @keyframes countUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
-}
-@keyframes soulScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 .scroll-track-left { animation: scrollLeft 60s linear infinite; display: flex; align-items: center; width: max-content; }
 .scroll-track-right { animation: scrollRight 70s linear infinite; display: flex; align-items: center; width: max-content; }
@@ -66,7 +62,7 @@ const QMark = ({ size = 22, color = 'var(--fg-primary)', style = {} }) => {
   );
 };
 Object.assign(window, { QMark });
-  const createPortal = ReactDOM.createPortal;
+const createPortal = ReactDOM.createPortal;
 </script>
 
 <script type="text/babel" src="Header.jsx"></script>
@@ -157,10 +153,8 @@ const HeroSection = ({ onBook }) => {
 const ClientStrips = () => {
   const theme = document.documentElement.getAttribute('data-theme');
   const isDark = theme !== 'light';
-  const fgColor = isDark ? 'rgba(255,255,255,VAL)' : 'rgba(0,0,0,VAL)';
   const logoFilter = isDark ? 'brightness(0) invert(1)' : 'brightness(0)';
 
-  // Strip 1 — mix of big brands + artists, scrolling left
   const strip1 = [
     { type: 'logo', slug: 'paramountplus', name: 'Paramount+' },
     { type: 'text', name: 'Diversity' },
@@ -184,7 +178,6 @@ const ClientStrips = () => {
     { type: 'text', name: 'MAZZA' },
   ];
 
-  // Strip 2 — mix of fashion, corporate, performing arts, scrolling right
   const strip2 = [
     { type: 'text', name: 'Dreams' },
     { type: 'text', name: 'Wilkes Academy' },
@@ -255,16 +248,12 @@ const ClientStrips = () => {
     <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0' }}>
       <div style={{ padding: '32px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
         <div className="client-strip">
-          <div className="scroll-track-left" style={{ gap: '0' }}>
-            {renderStrip(strip1)}
-          </div>
+          <div className="scroll-track-left" style={{ gap: '0' }}>{renderStrip(strip1)}</div>
         </div>
       </div>
       <div style={{ padding: '20px 0' }}>
         <div className="client-strip">
-          <div className="scroll-track-right" style={{ gap: '0' }}>
-            {renderStrip(strip2)}
-          </div>
+          <div className="scroll-track-right" style={{ gap: '0' }}>{renderStrip(strip2)}</div>
         </div>
       </div>
     </section>
@@ -293,7 +282,6 @@ const StatsStrip = () => {
       const isNumeric = /^\d+/.test(target);
       if (!isNumeric) return;
       const end = parseInt(target.replace(/\D/g, ''));
-      const suffix = target.replace(/^[\d,]+/, '');
       let start = 0;
       const steps = 60;
       const increment = end / steps;
@@ -311,7 +299,6 @@ const StatsStrip = () => {
     const isNumeric = /^\d+/.test(stat.number);
     const suffix = isNumeric ? stat.number.replace(/^[\d,]+/, '') : '';
     const count = useCounter(stat.number, 1.8, visible);
-
     return (
       <div className={`stat-item${visible ? ' visible' : ''}`} style={{
         padding: 'clamp(20px,3vw,32px)',
@@ -344,9 +331,7 @@ const StatsStrip = () => {
       gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
       gap: '2px',
     }}>
-      {stats.map((stat, i) => (
-        <StatItem key={i} stat={stat} index={i} visible={visible} />
-      ))}
+      {stats.map((stat, i) => <StatItem key={i} stat={stat} index={i} visible={visible} />)}
     </section>
   );
 };
@@ -359,7 +344,6 @@ const TestimonialsSection = () => {
     { quote: 'Testimonial coming soon.', name: 'Ashley Banjo MBE', role: 'Founder, Diversity · Soul Tour 2026' },
     { quote: 'Testimonial coming soon.', name: 'International Collective', role: 'Creative Production Partner · 5 years' },
   ];
-
   return (
     <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-secondary)' }}>
       <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
@@ -437,7 +421,6 @@ const ServicesSection = () => {
       items: ['Music videos', 'Live performance capture', 'Artist content & EPKs', 'Dance & performance films', 'Tour & event films'],
     },
   ];
-
   return (
     <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
       <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
@@ -466,7 +449,7 @@ const ServicesSection = () => {
   );
 };
 
-// ─── Portfolio ────────────────────────────────────────────────
+// ─── Soul Film Strip ──────────────────────────────────────────
 const SoulFilmStrip = () => {
   const images = [
     'assets/soul-1.jpg', 'assets/soul-2.jpg', 'assets/soul-3.jpg',
@@ -482,11 +465,13 @@ const SoulFilmStrip = () => {
   const dragStartX = React.useRef(0);
   const dragStartPos = React.useRef(0);
   const isPaused = React.useRef(false);
+  const stripRef = React.useRef(null);
   const [lightboxIndex, setLightboxIndex] = React.useState(null);
 
   const SPEED = 1.4;
   const GAP = 6;
 
+  // Auto scroll
   React.useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
@@ -503,38 +488,29 @@ const SoulFilmStrip = () => {
     return () => cancelAnimationFrame(animRef.current);
   }, []);
 
-  // Two-finger trackpad horizontal scroll
-  const onWheel = (e) => {
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      e.preventDefault();
-      const track = trackRef.current;
-      const half = track.scrollWidth / 2;
-      let next = posRef.current + e.deltaX;
-      if (next < 0) next = 0;
-      if (next >= half) next = half - 1;
-      posRef.current = next;
-      track.style.transform = `translateX(${-posRef.current}px)`;
-    }
-  };
-
-  const stripRef = React.useRef(null);
+  // Two-finger trackpad scroll
   React.useEffect(() => {
     const el = stripRef.current;
     if (!el) return;
+    const onWheel = (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        const track = trackRef.current;
+        const half = track.scrollWidth / 2;
+        let next = posRef.current + e.deltaX;
+        if (next < 0) next = 0;
+        if (next >= half) next = half - 1;
+        posRef.current = next;
+        track.style.transform = `translateX(${-posRef.current}px)`;
+      }
+    };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
   const onMouseEnter = () => { isPaused.current = true; };
   const onMouseLeave = () => { if (!dragging.current) isPaused.current = false; };
-
-  const onMouseDown = (e) => {
-    dragging.current = true;
-    dragStartX.current = e.clientX;
-    dragStartPos.current = posRef.current;
-    e.preventDefault();
-  };
-
+  const onMouseDown = (e) => { dragging.current = true; dragStartX.current = e.clientX; dragStartPos.current = posRef.current; e.preventDefault(); };
   const onMouseMove = (e) => {
     if (!dragging.current) return;
     const delta = dragStartX.current - e.clientX;
@@ -546,7 +522,6 @@ const SoulFilmStrip = () => {
     posRef.current = next;
     track.style.transform = `translateX(${-posRef.current}px)`;
   };
-
   const onMouseUp = () => { dragging.current = false; };
 
   const openLightbox = (index) => {
@@ -560,16 +535,10 @@ const SoulFilmStrip = () => {
     isPaused.current = false;
   };
 
-  const prevImage = (e) => {
-    e.stopPropagation();
-    setLightboxIndex(i => (i - 1 + images.length) % images.length);
-  };
+  const prevImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i - 1 + images.length) % images.length); };
+  const nextImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i + 1) % images.length); };
 
-  const nextImage = (e) => {
-    e.stopPropagation();
-    setLightboxIndex(i => (i + 1) % images.length);
-  };
-
+  // Keyboard navigation
   React.useEffect(() => {
     if (lightboxIndex === null) return;
     const onKey = (e) => {
@@ -581,32 +550,113 @@ const SoulFilmStrip = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [lightboxIndex]);
 
-  // Blur the page content behind the lightbox
+  // Blur #root when lightbox open — portal keeps lightbox outside root so it's unaffected
   React.useEffect(() => {
-    const main = document.querySelector('main');
-    const footer = document.querySelector('footer');
-    const header = document.querySelector('header');
-    [main, footer, header].forEach(el => {
-      if (!el) return;
-      if (lightboxIndex !== null) {
-        el.style.filter = 'blur(12px)';
-        el.style.transform = 'scale(0.98)';
-        el.style.transition = 'filter 0.4s ease, transform 0.4s ease';
-      } else {
-        el.style.filter = '';
-        el.style.transform = '';
-      }
-    });
+    const root = document.getElementById('root');
+    if (!root) return;
+    if (lightboxIndex !== null) {
+      root.style.filter = 'blur(14px)';
+      root.style.transform = 'scale(0.97)';
+      root.style.transition = 'filter 0.4s ease, transform 0.4s ease';
+    } else {
+      root.style.filter = '';
+      root.style.transform = '';
+    }
   }, [lightboxIndex]);
- return (
+
+  const Lightbox = () => createPortal(
+    <div
+      onClick={closeLightbox}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.4)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '40px',
+        animation: 'fadeIn 0.35s ease',
+      }}
+    >
+      {/* Close */}
+      <button onClick={closeLightbox} style={{
+        position: 'absolute', top: '24px', right: '28px',
+        background: 'none', border: 'none', color: '#fff',
+        fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
+        textTransform: 'uppercase', cursor: 'pointer',
+        opacity: 0.5, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.2s',
+      }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
+      >ESC</button>
+
+      {/* Counter */}
+      <div style={{
+        position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
+        fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
+        color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
+      }}>
+        {lightboxIndex + 1} / {images.length}
+      </div>
+
+      {/* Prev */}
+      <button onClick={prevImage} style={{
+        position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+      }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+      >←</button>
+
+      {/* Image */}
+      <div onClick={e => e.stopPropagation()} style={{
+        width: '100%', maxWidth: '1100px',
+        aspectRatio: '2.39 / 1',
+        overflow: 'hidden',
+        boxShadow: '0 40px 120px rgba(0,0,0,0.5)',
+      }}>
+        <img
+          key={lightboxIndex}
+          src={images[lightboxIndex]}
+          alt={`Soul Tour still ${lightboxIndex + 1}`}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', animation: 'fadeIn 0.3s ease' }}
+        />
+      </div>
+
+      {/* Next */}
+      <button onClick={nextImage} style={{
+        position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+      }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+      >→</button>
+
+      {/* Dots */}
+      <div style={{
+        position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', gap: '6px', alignItems: 'center',
+      }}>
+        {images.map((_, i) => (
+          <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
+            width: i === lightboxIndex ? '20px' : '4px', height: '2px',
+            background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
+            cursor: 'pointer', transition: 'all 0.3s ease',
+          }} />
+        ))}
+      </div>
+    </div>,
+    document.body
+  );
+
+  return (
     <>
-      {/* Strip */}
       <div
         ref={stripRef}
-        style={{
-          overflow: 'hidden', width: '100%', margin: '40px 0',
-          cursor: 'grab', userSelect: 'none',
-        }}
+        style={{ overflow: 'hidden', width: '100%', margin: '40px 0', cursor: 'grab', userSelect: 'none' }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseDown={onMouseDown}
@@ -631,127 +681,19 @@ const SoulFilmStrip = () => {
                 src={src}
                 alt={`Soul Tour still ${(i % images.length) + 1}`}
                 draggable={false}
-                style={{
-                  width: '100%', height: '100%',
-                  objectFit: 'cover', display: 'block',
-                  pointerEvents: 'none',
-                }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
               />
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.18)',
-              }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)', transition: 'opacity 0.3s ease' }} />
             </div>
           ))}
         </div>
       </div>
-
-      {/* Lightbox rendered on body via portal — outside main, unaffected by blur */}
-      {lightboxIndex !== null && createPortal(
-        <div
-          onClick={closeLightbox}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 999,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '40px',
-            animation: 'fadeIn 0.35s ease',
-          }}
-        >
-          <button
-            onClick={closeLightbox}
-            style={{
-              position: 'absolute', top: '24px', right: '28px',
-              background: 'none', border: 'none', color: '#fff',
-              fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
-              textTransform: 'uppercase', cursor: 'pointer',
-              opacity: 0.45, fontFamily: "'DM Sans', sans-serif",
-              transition: 'opacity 0.2s',
-            }}
-            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={e => e.currentTarget.style.opacity = '0.45'}
-          >ESC</button>
-
-          <div style={{
-            position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
-            fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
-            color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
-          }}>
-            {lightboxIndex + 1} / {images.length}
-          </div>
-
-          <button
-            onClick={prevImage}
-            style={{
-              position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: '1px solid rgba(255,255,255,0.2)',
-              color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
-              fontSize: '16px',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-          >←</button>
-
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              width: '100%', maxWidth: '1100px',
-              aspectRatio: '2.39 / 1',
-              position: 'relative', overflow: 'hidden',
-              boxShadow: '0 40px 120px rgba(0,0,0,0.6)',
-            }}
-          >
-            <img
-              key={lightboxIndex}
-              src={images[lightboxIndex]}
-              alt={`Soul Tour still ${lightboxIndex + 1}`}
-              style={{
-                width: '100%', height: '100%',
-                objectFit: 'cover', display: 'block',
-                animation: 'fadeIn 0.3s ease',
-              }}
-            />
-          </div>
-
-          <button
-            onClick={nextImage}
-            style={{
-              position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: '1px solid rgba(255,255,255,0.2)',
-              color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
-              fontSize: '16px',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-          >→</button>
-
-          <div style={{
-            position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: '6px', alignItems: 'center',
-          }}>
-            {images.map((_, i) => (
-              <div
-                key={i}
-                onClick={e => { e.stopPropagation(); setLightboxIndex(i); }}
-                style={{
-                  width: i === lightboxIndex ? '20px' : '4px',
-                  height: '2px',
-                  background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-              />
-            ))}
-          </div>
-        </div>,
-        document.body
-      )}
+      {lightboxIndex !== null && <Lightbox />}
     </>
   );
+};
+
+// ─── Portfolio ────────────────────────────────────────────────
 const PortfolioSection = () => {
   useReveal();
   const [hovered, setHovered] = React.useState(null);
@@ -815,15 +757,14 @@ const PortfolioSection = () => {
               </div>
             </div>
             {project.hasStrip && <SoulFilmStrip />}
-            {project.hasStrip && (
-              <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)', margin: '0' }} />
-            )}
+            {project.hasStrip && <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)' }} />}
           </div>
         ))}
       </div>
     </section>
   );
 };
+
 // ─── Booking CTA ──────────────────────────────────────────────
 const BookingCTASection = ({ onBook }) => {
   useReveal();
