@@ -582,18 +582,21 @@ const SoulFilmStrip = () => {
 
   // Blur the page content behind the lightbox
   React.useEffect(() => {
-    const root = document.getElementById('root');
-    if (!root) return;
-    if (lightboxIndex !== null) {
-      root.style.filter = 'blur(12px)';
-      root.style.transform = 'scale(0.98)';
-      root.style.transition = 'filter 0.4s ease, transform 0.4s ease';
-    } else {
-      root.style.filter = '';
-      root.style.transform = '';
-    }
+    const main = document.querySelector('main');
+    const footer = document.querySelector('footer');
+    const header = document.querySelector('header');
+    [main, footer, header].forEach(el => {
+      if (!el) return;
+      if (lightboxIndex !== null) {
+        el.style.filter = 'blur(12px)';
+        el.style.transform = 'scale(0.98)';
+        el.style.transition = 'filter 0.4s ease, transform 0.4s ease';
+      } else {
+        el.style.filter = '';
+        el.style.transform = '';
+      }
+    });
   }, [lightboxIndex]);
-
   return (
     <>
       {/* Strip */}
