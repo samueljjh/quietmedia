@@ -608,13 +608,13 @@ const SoulFilmStrip = () => {
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
       >←</button>
 
-      {/* Image */}
-      <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: '1100px',
-        aspectRatio: '2.39 / 1',
-        overflow: 'hidden',
-        boxShadow: '0 40px 120px rgba(0,0,0,0.5)',
-      }}>
+     {/* Image */}
+<div onClick={e => e.stopPropagation()} style={{
+  width: '100%', maxWidth: '1100px',
+  aspectRatio: '2.39 / 1',
+  overflow: 'hidden',
+  boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
+}}>
         <img
           key={lightboxIndex}
           src={images[lightboxIndex]}
@@ -640,13 +640,12 @@ const SoulFilmStrip = () => {
         position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
         display: 'flex', gap: '6px', alignItems: 'center',
       }}>
-        {/* Image */}
-<div onClick={e => e.stopPropagation()} style={{
-  width: '100%', maxWidth: '1100px',
-  aspectRatio: '2.39 / 1',
-  overflow: 'hidden',
-  boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
-}}>
+        {images.map((_, i) => (
+          <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
+            width: i === lightboxIndex ? '20px' : '4px', height: '2px',
+            background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
+            cursor: 'pointer', transition: 'all 0.3s ease',
+          }} />
         ))}
       </div>
     </div>,
