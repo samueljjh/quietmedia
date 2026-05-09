@@ -483,13 +483,12 @@ const SoulFilmStrip = () => {
   const isPaused = React.useRef(false);
   const [lightboxIndex, setLightboxIndex] = React.useState(null);
 
-  const SPEED = 0.5;
+  const SPEED = 1.4;
   const GAP = 6;
 
   React.useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-
     const tick = () => {
       if (!isPaused.current && !dragging.current) {
         posRef.current += SPEED;
@@ -501,6 +500,28 @@ const SoulFilmStrip = () => {
     };
     animRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  // Two-finger trackpad horizontal scroll
+  const onWheel = (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      e.preventDefault();
+      const track = trackRef.current;
+      const half = track.scrollWidth / 2;
+      let next = posRef.current + e.deltaX;
+      if (next < 0) next = 0;
+      if (next >= half) next = half - 1;
+      posRef.current = next;
+      track.style.transform = `translateX(${-posRef.current}px)`;
+    }
+  };
+
+  const stripRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
   }, []);
 
   const onMouseEnter = () => { isPaused.current = true; };
@@ -559,11 +580,29 @@ const SoulFilmStrip = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [lightboxIndex]);
 
+  // Blur the page content behind the lightbox
+  React.useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) return;
+    if (lightboxIndex !== null) {
+      root.style.filter = 'blur(12px)';
+      root.style.transform = 'scale(0.98)';
+      root.style.transition = 'filter 0.4s ease, transform 0.4s ease';
+    } else {
+      root.style.filter = '';
+      root.style.transform = '';
+    }
+  }, [lightboxIndex]);
+
   return (
     <>
       {/* Strip */}
       <div
-        style={{ overflow: 'hidden', width: '100%', margin: '40px 0', cursor: dragging.current ? 'grabbing' : 'grab', userSelect: 'none' }}
+        ref={stripRef}
+        style={{
+          overflow: 'hidden', width: '100%', margin: '40px 0',
+          cursor: 'grab', userSelect: 'none',
+        }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseDown={onMouseDown}
@@ -605,15 +644,13 @@ const SoulFilmStrip = () => {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox — sits outside root blur via portal-style fixed overlay */}
       {lightboxIndex !== null && (
         <div
           onClick={closeLightbox}
           style={{
             position: 'fixed', inset: 0, zIndex: 999,
-            background: 'rgba(0,0,0,0.92)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: 'rgba(0,0,0,0.5)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: '40px',
             animation: 'fadeIn 0.35s ease',
@@ -638,7 +675,7 @@ const SoulFilmStrip = () => {
           <div style={{
             position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
             fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
-            color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Sans', sans-serif",
+            color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
           }}>
             {lightboxIndex + 1} / {images.length}
           </div>
@@ -648,14 +685,14 @@ const SoulFilmStrip = () => {
             onClick={prevImage}
             style={{
               position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: '1px solid rgba(255,255,255,0.15)',
-              color: 'rgba(255,255,255,0.5)', width: '44px', height: '44px',
+              background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+              color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
               fontSize: '16px',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
           >←</button>
 
           {/* Image */}
@@ -665,6 +702,7 @@ const SoulFilmStrip = () => {
               width: '100%', maxWidth: '1100px',
               aspectRatio: '2.39 / 1',
               position: 'relative', overflow: 'hidden',
+              boxShadow: '0 40px 120px rgba(0,0,0,0.6)',
             }}
           >
             <img
@@ -684,20 +722,20 @@ const SoulFilmStrip = () => {
             onClick={nextImage}
             style={{
               position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: '1px solid rgba(255,255,255,0.15)',
-              color: 'rgba(255,255,255,0.5)', width: '44px', height: '44px',
+              background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+              color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
               fontSize: '16px',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
           >→</button>
 
           {/* Dot indicators */}
           <div style={{
             position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: '6px',
+            display: 'flex', gap: '6px', alignItems: 'center',
           }}>
             {images.map((_, i) => (
               <div
@@ -718,7 +756,6 @@ const SoulFilmStrip = () => {
     </>
   );
 };
-
 const PortfolioSection = () => {
   useReveal();
   const [hovered, setHovered] = React.useState(null);
