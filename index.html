@@ -470,57 +470,248 @@ const SoulFilmStrip = () => {
     'assets/soul-10.jpg',
   ];
 
+  const trackRef = React.useRef(null);
+  const animRef = React.useRef(null);
+  const posRef = React.useRef(0);
+  const dragging = React.useRef(false);
+  const dragStartX = React.useRef(0);
+  const dragStartPos = React.useRef(0);
+  const isPaused = React.useRef(false);
+  const [lightboxIndex, setLightboxIndex] = React.useState(null);
+
+  const SPEED = 0.5;
+  const GAP = 6;
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const tick = () => {
+      if (!isPaused.current && !dragging.current) {
+        posRef.current += SPEED;
+        const half = track.scrollWidth / 2;
+        if (posRef.current >= half) posRef.current = 0;
+        track.style.transform = `translateX(${-posRef.current}px)`;
+      }
+      animRef.current = requestAnimationFrame(tick);
+    };
+    animRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  const onMouseEnter = () => { isPaused.current = true; };
+  const onMouseLeave = () => { if (!dragging.current) isPaused.current = false; };
+
+  const onMouseDown = (e) => {
+    dragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartPos.current = posRef.current;
+    e.preventDefault();
+  };
+
+  const onMouseMove = (e) => {
+    if (!dragging.current) return;
+    const delta = dragStartX.current - e.clientX;
+    const track = trackRef.current;
+    const half = track.scrollWidth / 2;
+    let next = dragStartPos.current + delta;
+    if (next < 0) next = 0;
+    if (next >= half) next = half - 1;
+    posRef.current = next;
+    track.style.transform = `translateX(${-posRef.current}px)`;
+  };
+
+  const onMouseUp = () => { dragging.current = false; };
+
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    setLightboxIndex(null);
+    document.body.style.overflow = '';
+    isPaused.current = false;
+  };
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    setLightboxIndex(i => (i - 1 + images.length) % images.length);
+  };
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setLightboxIndex(i => (i + 1) % images.length);
+  };
+
+  React.useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') setLightboxIndex(i => (i + 1) % images.length);
+      if (e.key === 'ArrowLeft') setLightboxIndex(i => (i - 1 + images.length) % images.length);
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxIndex]);
+
   return (
-    <div style={{
-      overflow: 'hidden', width: '100%', margin: '40px 0',
-      cursor: 'grab',
-    }}
-      onMouseEnter={e => {
-        e.currentTarget.querySelector('.soul-track').style.animationPlayState = 'paused';
-        e.currentTarget.style.cursor = 'grab';
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.querySelector('.soul-track').style.animationPlayState = 'running';
-      }}
-    >
-      <div className="soul-track" style={{
-        display: 'flex', gap: '6px',
-        width: 'max-content',
-        animation: 'soulScroll 40s linear infinite',
-      }}>
-        {[...images, ...images].map((src, i) => (
-          <div key={i} style={{
-            flexShrink: 0,
-            width: 'clamp(320px, 38vw, 560px)',
-            aspectRatio: '2.39 / 1',
-            overflow: 'hidden',
-            position: 'relative',
+    <>
+      {/* Strip */}
+      <div
+        style={{ overflow: 'hidden', width: '100%', margin: '40px 0', cursor: dragging.current ? 'grabbing' : 'grab', userSelect: 'none' }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
+        <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
+          {[...images, ...images].map((src, i) => (
+            <div
+              key={i}
+              onClick={() => openLightbox(i % images.length)}
+              style={{
+                flexShrink: 0,
+                width: 'clamp(320px, 38vw, 560px)',
+                aspectRatio: '2.39 / 1',
+                overflow: 'hidden',
+                position: 'relative',
+                cursor: 'pointer',
+              }}
+            >
+              <img
+                src={src}
+                alt={`Soul Tour still ${(i % images.length) + 1}`}
+                draggable={false}
+                style={{
+                  width: '100%', height: '100%',
+                  objectFit: 'cover', display: 'block',
+                  transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+                  pointerEvents: 'none',
+                }}
+              />
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,0,0,0.18)',
+                transition: 'opacity 0.4s ease',
+              }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightboxIndex !== null && (
+        <div
+          onClick={closeLightbox}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 999,
+            background: 'rgba(0,0,0,0.92)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '40px',
+            animation: 'fadeIn 0.35s ease',
+          }}
+        >
+          {/* Close */}
+          <button
+            onClick={closeLightbox}
+            style={{
+              position: 'absolute', top: '24px', right: '28px',
+              background: 'none', border: 'none', color: '#fff',
+              fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
+              textTransform: 'uppercase', cursor: 'pointer',
+              opacity: 0.45, fontFamily: "'DM Sans', sans-serif",
+              transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '0.45'}
+          >ESC</button>
+
+          {/* Counter */}
+          <div style={{
+            position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
+            fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
+            color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Sans', sans-serif",
           }}>
+            {lightboxIndex + 1} / {images.length}
+          </div>
+
+          {/* Prev */}
+          <button
+            onClick={prevImage}
+            style={{
+              position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.5)', width: '44px', height: '44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
+              fontSize: '16px',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+          >←</button>
+
+          {/* Image */}
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: '1100px',
+              aspectRatio: '2.39 / 1',
+              position: 'relative', overflow: 'hidden',
+            }}
+          >
             <img
-              src={src}
-              alt={`Soul Tour still ${(i % images.length) + 1}`}
+              key={lightboxIndex}
+              src={images[lightboxIndex]}
+              alt={`Soul Tour still ${lightboxIndex + 1}`}
               style={{
                 width: '100%', height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-                transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+                objectFit: 'cover', display: 'block',
+                animation: 'fadeIn 0.3s ease',
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-            />
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'rgba(0,0,0,0.18)',
-              transition: 'opacity 0.4s ease',
-              pointerEvents: 'none',
-            }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             />
           </div>
-        ))}
-      </div>
-    </div>
+
+          {/* Next */}
+          <button
+            onClick={nextImage}
+            style={{
+              position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
+              background: 'none', border: '1px solid rgba(255,255,255,0.15)',
+              color: 'rgba(255,255,255,0.5)', width: '44px', height: '44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s',
+              fontSize: '16px',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.color = '#fff'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+          >→</button>
+
+          {/* Dot indicators */}
+          <div style={{
+            position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', gap: '6px',
+          }}>
+            {images.map((_, i) => (
+              <div
+                key={i}
+                onClick={e => { e.stopPropagation(); setLightboxIndex(i); }}
+                style={{
+                  width: i === lightboxIndex ? '20px' : '4px',
+                  height: '2px',
+                  background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
