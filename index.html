@@ -26,6 +26,10 @@
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes soulScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 .scroll-track-left { animation: scrollLeft 60s linear infinite; display: flex; align-items: center; width: max-content; }
 .scroll-track-right { animation: scrollRight 70s linear infinite; display: flex; align-items: center; width: max-content; }
 .client-strip { overflow: hidden; width: 100%; }
