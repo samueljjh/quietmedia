@@ -15,10 +15,12 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
   const handleNav = (id) => { setMenuOpen(false); onNavigate(id); };
 
   const onHero = currentPage === 'home' && !scrolled;
+  const onHeroDark = onHero && theme === 'dark';
+  const onHeroLight = onHero && theme === 'light';
 
   const navBg = scrolled || menuOpen
     ? `rgba(var(--bg-rgb), 0.97)`
-    : onHero && theme === 'light'
+    : onHeroLight
       ? `rgba(var(--bg-rgb), 0.5)`
       : 'transparent';
 
@@ -32,7 +34,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
   const ThemeToggle = () => (
     <button onClick={onToggleTheme} aria-label="Toggle theme" style={{
       background: 'none', border: 'none', cursor: 'pointer', padding: '6px',
-      color: onHero ? 'rgba(255,255,255,0.6)' : 'var(--fg-primary)',
+      color: onHeroDark ? 'rgba(255,255,255,0.6)' : 'var(--fg-primary)',
       opacity: 0.45,
       display: 'flex', alignItems: 'center',
       transition: 'opacity 0.2s',
@@ -79,11 +81,11 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', gap: '10px', zIndex: 201,
         }}>
-          <QMark size={20} color={onHero ? '#ffffff' : 'var(--fg-primary)'} />
+          <QMark size={20} color={onHeroDark ? '#ffffff' : 'var(--fg-primary)'} />
           <span style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: '15px', fontWeight: 300, letterSpacing: '-0.01em',
-            color: onHero ? '#ffffff' : 'var(--fg-primary)',
+            color: onHeroDark ? '#ffffff' : 'var(--fg-primary)',
             transition: 'color 0.3s ease',
           }}>quiet media</span>
         </button>
@@ -96,13 +98,13 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '10px', fontWeight: 500,
                 letterSpacing: '0.24em', textTransform: 'uppercase',
-                color: onHero
+                color: onHeroDark
                   ? currentPage === item.id ? '#ffffff' : 'rgba(255,255,255,0.5)'
                   : currentPage === item.id ? 'var(--fg-primary)' : `rgba(var(--fg-rgb),0.4)`,
                 background: 'none', border: 'none', cursor: 'pointer', padding: 0,
                 transition: 'color 0.3s ease',
                 borderBottom: currentPage === item.id
-                  ? onHero ? '1px solid rgba(255,255,255,0.5)' : `1px solid rgba(var(--fg-rgb),0.45)`
+                  ? onHeroDark ? '1px solid rgba(255,255,255,0.5)' : `1px solid rgba(var(--fg-rgb),0.45)`
                   : '1px solid transparent',
                 paddingBottom: '2px',
               }}>{item.label}</button>
@@ -111,8 +113,8 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
             <button onClick={() => onNavigate('book')} style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: onHero ? '#0A0A0A' : 'var(--bg-primary)',
-              background: onHero ? '#ffffff' : 'var(--fg-primary)',
+              color: onHeroDark ? '#0A0A0A' : 'var(--bg-primary)',
+              background: onHeroDark ? '#ffffff' : 'var(--fg-primary)',
               border: 'none', padding: '10px 22px', cursor: 'pointer', transition: 'opacity 0.2s ease',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
@@ -132,7 +134,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
               {[0,1,2].map(i => (
                 <span key={i} style={{
                   display: 'block', width: '22px', height: '1px',
-                  background: onHero ? '#ffffff' : 'var(--fg-primary)',
+                  background: onHeroDark ? '#ffffff' : 'var(--fg-primary)',
                   transition: 'transform 0.3s, opacity 0.3s',
                   transform: i === 0 && menuOpen ? 'translateY(6px) rotate(45deg)' : i === 2 && menuOpen ? 'translateY(-6px) rotate(-45deg)' : 'none',
                   opacity: i === 1 && menuOpen ? 0 : 1,
