@@ -658,8 +658,8 @@ const SoulFilmStrip = () => {
   ref={stripRef}
   style={{
     overflow: 'hidden', width: '100%', margin: '40px 0', cursor: 'grab', userSelect: 'none',
-    maskImage: 'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
-    WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)',
+   maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
+WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
   }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
