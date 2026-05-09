@@ -458,6 +458,68 @@ const ServicesSection = () => {
 };
 
 // ─── Portfolio ────────────────────────────────────────────────
+const SoulFilmStrip = () => {
+  const images = [
+    'assets/soul-1.jpg', 'assets/soul-2.jpg', 'assets/soul-3.jpg',
+    'assets/soul-4.jpg', 'assets/soul-5.jpg', 'assets/soul-6.jpg',
+    'assets/soul-7.jpg', 'assets/soul-8.jpg', 'assets/soul-9.jpg',
+    'assets/soul-10.jpg',
+  ];
+
+  return (
+    <div style={{
+      overflow: 'hidden', width: '100%', margin: '40px 0',
+      cursor: 'grab',
+    }}
+      onMouseEnter={e => {
+        e.currentTarget.querySelector('.soul-track').style.animationPlayState = 'paused';
+        e.currentTarget.style.cursor = 'grab';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.querySelector('.soul-track').style.animationPlayState = 'running';
+      }}
+    >
+      <div className="soul-track" style={{
+        display: 'flex', gap: '6px',
+        width: 'max-content',
+        animation: 'soulScroll 40s linear infinite',
+      }}>
+        {[...images, ...images].map((src, i) => (
+          <div key={i} style={{
+            flexShrink: 0,
+            width: 'clamp(320px, 38vw, 560px)',
+            aspectRatio: '2.39 / 1',
+            overflow: 'hidden',
+            position: 'relative',
+          }}>
+            <img
+              src={src}
+              alt={`Soul Tour still ${(i % images.length) + 1}`}
+              style={{
+                width: '100%', height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+                transition: 'transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+              }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+            />
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'rgba(0,0,0,0.18)',
+              transition: 'opacity 0.4s ease',
+              pointerEvents: 'none',
+            }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const PortfolioSection = () => {
   useReveal();
   const [hovered, setHovered] = React.useState(null);
@@ -468,6 +530,7 @@ const PortfolioSection = () => {
       year: '2026',
       detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
       quote: 'Films exploring humanity and human connection in a world full of AI — played on LED screens to 100,000+ people live.',
+      hasStrip: true,
     },
     {
       title: 'Look to the Light',
@@ -475,6 +538,7 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Director of Photography & Producer · Paramount+ · Amazon Prime · Sky Store · Apple TV · YouTube',
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
+      hasStrip: false,
     },
     {
       title: 'Hellfire the Film',
@@ -482,46 +546,52 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Quiet Media production',
       quote: '',
+      hasStrip: false,
     },
   ];
 
   return (
-    <section id="portfolio" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
-      <div className="reveal" style={{ marginBottom: 'clamp(36px,5vw,56px)' }}>
+    <section id="portfolio" style={{ padding: 'clamp(80px,10vw,140px) 0', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+      <div className="reveal" style={{ marginBottom: 'clamp(36px,5vw,56px)', padding: '0 clamp(24px,5vw,80px)' }}>
         <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '14px' }}>OUR WORK</p>
         <h2 style={{ fontSize: 'clamp(28px,4vw,48px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.1 }}>Selected projects.</h2>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {projects.map((project, i) => (
-          <div key={i} className="reveal"
-            onMouseEnter={() => setHovered(i)}
-            onMouseLeave={() => setHovered(null)}
-            style={{
-              padding: 'clamp(28px,4vw,44px) 0',
-              borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
-              borderBottom: i === projects.length - 1 ? '1px solid rgba(var(--fg-rgb),0.07)' : 'none',
-              transition: 'opacity 0.2s',
-              opacity: hovered !== null && hovered !== i ? 0.4 : 1,
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '10px' }}>{project.type}</p>
-                <h3 style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.02em', marginBottom: '12px', lineHeight: 1.1 }}>{project.title}</h3>
-                <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.35)', lineHeight: 1.7, marginBottom: project.quote ? '16px' : '0', maxWidth: '560px' }}>{project.detail}</p>
-                {project.quote && (
-                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.7, fontStyle: 'italic', maxWidth: '560px', borderLeft: '2px solid rgba(var(--fg-rgb),0.12)', paddingLeft: '16px' }}>{project.quote}</p>
-                )}
+          <div key={i}>
+            <div className="reveal"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                padding: 'clamp(28px,4vw,44px) clamp(24px,5vw,80px)',
+                borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
+                borderBottom: !project.hasStrip && i === projects.length - 1 ? '1px solid rgba(var(--fg-rgb),0.07)' : 'none',
+                transition: 'opacity 0.2s',
+                opacity: hovered !== null && hovered !== i ? 0.4 : 1,
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '10px' }}>{project.type}</p>
+                  <h3 style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.02em', marginBottom: '12px', lineHeight: 1.1 }}>{project.title}</h3>
+                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.35)', lineHeight: 1.7, marginBottom: project.quote ? '16px' : '0', maxWidth: '560px' }}>{project.detail}</p>
+                  {project.quote && (
+                    <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.7, fontStyle: 'italic', maxWidth: '560px', borderLeft: '2px solid rgba(var(--fg-rgb),0.12)', paddingLeft: '16px' }}>{project.quote}</p>
+                  )}
+                </div>
+                <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }}>{project.year}</span>
               </div>
-              <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }}>{project.year}</span>
             </div>
+            {project.hasStrip && <SoulFilmStrip />}
+            {project.hasStrip && (
+              <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)', margin: '0' }} />
+            )}
           </div>
         ))}
       </div>
     </section>
   );
 };
-
 // ─── Booking CTA ──────────────────────────────────────────────
 const BookingCTASection = ({ onBook }) => {
   useReveal();
