@@ -134,7 +134,6 @@ const HeroSection = ({ onBook }) => {
           </div>
         </div>
       </section>
-
       {lightboxOpen && (
         <div onClick={closeLightbox} style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
           <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'pointer', opacity: 0.6, lineHeight: 1 }}>✕</button>
@@ -218,17 +217,11 @@ const ClientStrips = () => {
     const isImg = item.type === 'logo' || item.type === 'url';
     const dimColor = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.3)';
     const brightColor = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)';
-
     return (
-      <div
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 44px' : '0 4px', flexShrink: 0 }}
-      >
+      <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+        style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 44px' : '0 4px', flexShrink: 0 }}>
         {isImg ? (
-          <img
-            src={imgSrc}
-            alt={item.name}
+          <img src={imgSrc} alt={item.name}
             style={{ height: '40px', width: 'auto', maxWidth: '110px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
             onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: item.name, style: `font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;color:${dimColor};font-family:'DM Sans',sans-serif` })); }}
           />
@@ -323,13 +316,9 @@ const StatsStrip = () => {
 
   return (
     <section ref={ref} style={{
-      background: '#EDECE8',
-      borderTop: '1px solid rgba(10,10,10,0.08)',
-      borderBottom: '1px solid rgba(10,10,10,0.08)',
+      background: '#EDECE8', borderTop: '1px solid rgba(10,10,10,0.08)', borderBottom: '1px solid rgba(10,10,10,0.08)',
       padding: 'clamp(48px,7vw,88px) clamp(24px,5vw,80px)',
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-      gap: '2px',
+      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '2px',
     }}>
       {stats.map((stat, i) => <StatItem key={i} stat={stat} index={i} visible={visible} />)}
     </section>
@@ -369,6 +358,43 @@ const TestimonialsSection = () => {
 // ─── About ────────────────────────────────────────────────────
 const AboutSection = () => {
   useReveal();
+  const values = [
+    { word: 'QUIET', desc: 'We let the work speak.' },
+    { word: 'FOCUSED', desc: 'Every decision serves the story.' },
+    { word: 'PURPOSEFUL', desc: 'Nothing is accidental.' },
+    { word: 'RELIABLE', desc: 'You can count on us, every time.' },
+    { word: 'CREATIVE', desc: 'Craft is at the centre of everything.' },
+  ];
+  const ValueRow = ({ item }) => {
+    const [h, setH] = React.useState(false);
+    return (
+      <div
+        onMouseEnter={() => setH(true)}
+        onMouseLeave={() => setH(false)}
+        style={{
+          display: 'flex', alignItems: 'baseline', gap: '20px',
+          padding: '18px 0', cursor: 'default',
+          borderBottom: '1px solid',
+          borderColor: h ? 'rgba(var(--fg-rgb),0.18)' : 'rgba(var(--fg-rgb),0.06)',
+          transition: 'border-color 0.3s ease',
+        }}>
+        <span style={{
+          fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em',
+          minWidth: '100px', display: 'inline-block',
+          color: h ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.22)',
+          transform: h ? 'translateX(4px)' : 'translateX(0)',
+          transition: 'color 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+        }}>{item.word}</span>
+        <span style={{
+          fontSize: '14px', fontWeight: 300, letterSpacing: '0.01em', display: 'inline-block',
+          color: h ? 'rgba(var(--fg-rgb),0.85)' : 'rgba(var(--fg-rgb),0.5)',
+          transform: h ? 'translateX(2px)' : 'translateX(0)',
+          transition: 'color 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1) 0.03s',
+        }}>{item.desc}</span>
+      </div>
+    );
+  };
+
   return (
     <section id="about" className="two-col-grid" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', gap: 'clamp(40px,6vw,100px)' }}>
       <div className="reveal">
@@ -384,18 +410,7 @@ const AboutSection = () => {
         </p>
       </div>
       <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        {[
-          { word: 'QUIET', desc: 'We let the work speak.' },
-          { word: 'FOCUSED', desc: 'Every decision serves the story.' },
-          { word: 'PURPOSEFUL', desc: 'Nothing is accidental.' },
-          { word: 'RELIABLE', desc: 'You can count on us, every time.' },
-          { word: 'CREATIVE', desc: 'Craft is at the centre of everything.' },
-        ].map((item) => (
-          <div key={item.word} style={{ display: 'flex', alignItems: 'baseline', gap: '20px', padding: '18px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
-            <span style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', color: 'rgba(var(--fg-rgb),0.22)', minWidth: '100px' }}>{item.word}</span>
-            <span style={{ fontSize: '14px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', letterSpacing: '0.01em' }}>{item.desc}</span>
-          </div>
-        ))}
+        {values.map(item => <ValueRow key={item.word} item={item} />)}
       </div>
     </section>
   );
@@ -404,6 +419,30 @@ const AboutSection = () => {
 // ─── Services ─────────────────────────────────────────────────
 const ServicesSection = () => {
   useReveal();
+
+  const ServiceItem = ({ item }) => {
+    const [h, setH] = React.useState(false);
+    return (
+      <div
+        onMouseEnter={() => setH(true)}
+        onMouseLeave={() => setH(false)}
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'default' }}>
+        <div style={{
+          width: '3px', height: '3px', borderRadius: '50%', flexShrink: 0,
+          background: h ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.25)',
+          transform: h ? 'translateX(4px) scale(1.4)' : 'translateX(0) scale(1)',
+          transition: 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease',
+        }} />
+        <span style={{
+          fontSize: '13px', fontWeight: 300, lineHeight: 1.5, display: 'inline-block',
+          color: h ? 'rgba(var(--fg-rgb),0.8)' : 'rgba(var(--fg-rgb),0.45)',
+          transform: h ? 'translateX(3px)' : 'translateX(0)',
+          transition: 'color 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+        }}>{item}</span>
+      </div>
+    );
+  };
+
   const services = [
     {
       label: 'CORPORATE & BRAND',
@@ -421,6 +460,7 @@ const ServicesSection = () => {
       items: ['Music videos', 'Live performance capture', 'Artist content & EPKs', 'Dance & performance films', 'Tour & event films'],
     },
   ];
+
   return (
     <section style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
       <div className="reveal" style={{ marginBottom: 'clamp(48px,6vw,72px)' }}>
@@ -435,12 +475,7 @@ const ServicesSection = () => {
             <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '18px' }}>{s.label}</p>
             <h3 style={{ fontSize: 'clamp(18px,2vw,22px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.01em', lineHeight: 1.25, marginBottom: '24px', textWrap: 'pretty' }}>{s.title}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-              {s.items.map((item, j) => (
-                <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '3px', height: '3px', borderRadius: '50%', background: 'rgba(var(--fg-rgb),0.25)', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.45)', lineHeight: 1.5 }}>{item}</span>
-                </div>
-              ))}
+              {s.items.map((item, j) => <ServiceItem key={j} item={item} />)}
             </div>
           </div>
         ))}
@@ -552,16 +587,12 @@ const SoulFilmStrip = () => {
   }, [lightboxIndex]);
 
   const Lightbox = () => createPortal(
-    <div
-      onClick={closeLightbox}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.4)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '40px',
-        animation: 'fadeIn 0.35s ease',
-      }}
-    >
+    <div onClick={closeLightbox} style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(0,0,0,0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '40px', animation: 'fadeIn 0.35s ease',
+    }}>
       <button onClick={closeLightbox} style={{
         position: 'absolute', top: '24px', right: '28px',
         background: 'none', border: 'none', color: '#fff',
@@ -572,15 +603,11 @@ const SoulFilmStrip = () => {
         onMouseEnter={e => e.currentTarget.style.opacity = '1'}
         onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
       >ESC</button>
-
       <div style={{
         position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
         fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
         color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
-      }}>
-        {lightboxIndex + 1} / {images.length}
-      </div>
-
+      }}>{lightboxIndex + 1} / {images.length}</div>
       <button onClick={prevImage} style={{
         position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
@@ -591,21 +618,15 @@ const SoulFilmStrip = () => {
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
       >←</button>
-
       <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: '1100px',
-        aspectRatio: '2.39 / 1',
-        overflow: 'hidden',
-        boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
+        width: '100%', maxWidth: '1100px', aspectRatio: '2.39 / 1',
+        overflow: 'hidden', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
       }}>
-        <img
-          key={lightboxIndex}
-          src={images[lightboxIndex]}
+        <img key={lightboxIndex} src={images[lightboxIndex]}
           alt={`Soul Tour still ${lightboxIndex + 1}`}
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', animation: 'fadeIn 0.3s ease' }}
         />
       </div>
-
       <button onClick={nextImage} style={{
         position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
@@ -616,7 +637,6 @@ const SoulFilmStrip = () => {
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
       >→</button>
-
       <div style={{
         position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
         display: 'flex', gap: '6px', alignItems: 'center',
@@ -635,14 +655,12 @@ const SoulFilmStrip = () => {
 
   return (
     <>
-      <div
-        ref={stripRef}
-        style={{
-          overflow: 'hidden', width: '100%', margin: '40px 0',
-          cursor: 'grab', userSelect: 'none',
-          maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
-        }}
+      <div ref={stripRef} style={{
+        overflow: 'hidden', width: '100%', margin: '40px 0',
+        cursor: 'grab', userSelect: 'none',
+        maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
+      }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onMouseDown={onMouseDown}
@@ -651,16 +669,11 @@ const SoulFilmStrip = () => {
       >
         <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
           {[...images, ...images].map((src, i) => (
-            <div
-              key={i}
-              onClick={() => openLightbox(i % images.length)}
+            <div key={i} onClick={() => openLightbox(i % images.length)}
               style={{
-                flexShrink: 0,
-                width: 'clamp(320px, 38vw, 560px)',
-                aspectRatio: '2.39 / 1',
-                overflow: 'hidden',
-                position: 'relative',
-                cursor: 'pointer',
+                flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
+                aspectRatio: '2.39 / 1', overflow: 'hidden',
+                position: 'relative', cursor: 'pointer',
               }}
               onMouseEnter={e => {
                 e.currentTarget.querySelector('img').style.transform = 'scale(1.06)';
@@ -671,22 +684,16 @@ const SoulFilmStrip = () => {
                 e.currentTarget.querySelector('div').style.opacity = '1';
               }}
             >
-              <img
-                src={src}
-                alt={`Soul Tour still ${(i % images.length) + 1}`}
-                draggable={false}
+              <img src={src} alt={`Soul Tour still ${(i % images.length) + 1}`} draggable={false}
                 style={{
-                  width: '100%', height: '100%',
-                  objectFit: 'cover', display: 'block',
+                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                   pointerEvents: 'none',
                   transition: 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}
               />
               <div style={{
-                position: 'absolute', inset: 0,
-                background: 'rgba(0,0,0,0.15)',
-                transition: 'opacity 0.5s ease',
-                pointerEvents: 'none',
+                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)',
+                transition: 'opacity 0.5s ease', pointerEvents: 'none',
               }} />
             </div>
           ))}
@@ -751,7 +758,13 @@ const PortfolioSection = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '10px' }}>{project.type}</p>
-                  <h3 style={{ fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.02em', marginBottom: '12px', lineHeight: 1.1 }}>{project.title}</h3>
+                  <h3 style={{
+                    fontSize: 'clamp(22px,3vw,36px)', fontWeight: 300,
+                    color: 'var(--fg-primary)', letterSpacing: '-0.02em',
+                    marginBottom: '12px', lineHeight: 1.1, display: 'inline-block',
+                    transform: hovered === i ? 'translateX(6px)' : 'translateX(0)',
+                    transition: 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+                  }}>{project.title}</h3>
                   <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.35)', lineHeight: 1.7, marginBottom: project.quote ? '16px' : '0', maxWidth: '560px' }}>{project.detail}</p>
                   {project.quote && (
                     <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.7, fontStyle: 'italic', maxWidth: '560px', borderLeft: '2px solid rgba(var(--fg-rgb),0.12)', paddingLeft: '16px' }}>{project.quote}</p>
