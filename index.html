@@ -50,7 +50,7 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 1s ease;
-  background: radial-gradient(600px circle at 50% 50%, rgba(255,252,245,4) 0%, transparent 70%);
+  background: radial-gradient(600px circle at 50% 50%, rgba(255,252,245,0.05) 0%, transparent 70%);
 }
 [data-theme="dark"] #cursor-atmosphere { opacity: 1; }
 </style>
@@ -74,12 +74,12 @@
 
   // Lerp factor — lower = more lag = more liquid feel
   // 0.04 is very slow and heavy, 0.12 is quicker but still smooth
-  const LERP = 0.055;
+  const LERP = 0.09;
 
   function animate() {
     current.x += (target.x - current.x) * LERP;
     current.y += (target.y - current.y) * LERP;
-    el.style.background = `radial-gradient(600px circle at ${current.x}px ${current.y}px, rgba(255,252,245,0.1) 0%, transparent 70%)`;
+    el.style.background = `radial-gradient(600px circle at ${current.x}px ${current.y}px, rgba(255,252,245,0.05) 0%, transparent 70%)`;
     raf = requestAnimationFrame(animate);
   }
   animate();
