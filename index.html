@@ -83,7 +83,7 @@ const useReveal = () => {
 };
 
 // ─── Reusable Film Strip ───────────────────────────────────────
-const FilmStrip = ({ images, id }) => {
+const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
   const trackRef = React.useRef(null);
   const animRef = React.useRef(null);
   const posRef = React.useRef(0);
@@ -93,8 +93,6 @@ const FilmStrip = ({ images, id }) => {
   const isPaused = React.useRef(false);
   const stripRef = React.useRef(null);
   const [lightboxIndex, setLightboxIndex] = React.useState(null);
-
-  const SPEED = 1.4;
   const GAP = 6;
 
   React.useEffect(() => {
@@ -102,16 +100,21 @@ const FilmStrip = ({ images, id }) => {
     if (!track) return;
     const tick = () => {
       if (!isPaused.current && !dragging.current) {
-        posRef.current += SPEED;
         const half = track.scrollWidth / 2;
-        if (posRef.current >= half) posRef.current = 0;
+        if (direction === 'left') {
+          posRef.current += speed;
+          if (posRef.current >= half) posRef.current = 0;
+        } else {
+          posRef.current -= speed;
+          if (posRef.current <= 0) posRef.current = half;
+        }
         track.style.transform = `translateX(${-posRef.current}px)`;
       }
       animRef.current = requestAnimationFrame(tick);
     };
     animRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animRef.current);
-  }, []);
+  }, [direction, speed]);
 
   React.useEffect(() => {
     const el = stripRef.current;
@@ -258,7 +261,10 @@ const FilmStrip = ({ images, id }) => {
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
       >
-        <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
+        <div ref={trackRef} style={{
+          display: 'flex', gap: `${GAP}px`, width: 'max-content',
+          transform: direction === 'right' ? `translateX(${-posRef.current}px)` : undefined,
+        }}>
           {[...images, ...images].map((src, i) => (
             <div key={i} onClick={() => openLightbox(i % images.length)}
               style={{
@@ -702,13 +708,11 @@ const PortfolioSection = () => {
     'assets/soul-5.jpg','assets/soul-6.jpg','assets/soul-7.jpg','assets/soul-8.jpg',
     'assets/soul-9.jpg','assets/soul-10.jpg',
   ];
-
   const lttlImages = [
     'assets/LTTL-1.jpg','assets/LTTL-2.jpg','assets/LTTL-3.jpg','assets/LTTL-4.jpg',
     'assets/LTTL-5.jpg','assets/LTTL-6.jpg','assets/LTTL-7.jpg','assets/LTTL-8.jpg',
     'assets/LTTL-9.jpg',
   ];
-
   const hfImages = [
     'assets/HF-1.jpeg','assets/HF-2.jpeg','assets/HF-3.jpeg','assets/HF-4.jpeg',
     'assets/HF-5.jpeg','assets/HF-6.jpeg','assets/HF-7.jpeg','assets/HF-8.jpeg',
@@ -723,6 +727,8 @@ const PortfolioSection = () => {
       detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
       quote: 'Films exploring humanity and human connection in a world full of AI — played on LED screens to 100,000+ people live.',
       images: soulImages,
+      direction: 'left',
+      speed: 1.4,
     },
     {
       title: 'Look to the Light',
@@ -731,6 +737,8 @@ const PortfolioSection = () => {
       detail: 'Director of Photography & Producer · Paramount+ · Amazon Prime · Sky Store · Apple TV · YouTube',
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
       images: lttlImages,
+      direction: 'right',
+      speed: 1.1,
     },
     {
       title: 'Hellfire the Film',
@@ -739,6 +747,8 @@ const PortfolioSection = () => {
       detail: 'Quiet Media production',
       quote: '',
       images: hfImages,
+      direction: 'left',
+      speed: 1.7,
     },
   ];
 
@@ -779,7 +789,7 @@ const PortfolioSection = () => {
                 <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }}>{project.year}</span>
               </div>
             </div>
-            <FilmStrip images={project.images} id={`strip-${i}`} />
+            <FilmStrip images={project.images} id={`strip-${i}`} direction={project.direction} speed={project.speed} />
             <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)' }} />
           </div>
         ))}
