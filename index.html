@@ -82,6 +82,219 @@ const useReveal = () => {
   });
 };
 
+// ─── Reusable Film Strip ───────────────────────────────────────
+const FilmStrip = ({ images, id }) => {
+  const trackRef = React.useRef(null);
+  const animRef = React.useRef(null);
+  const posRef = React.useRef(0);
+  const dragging = React.useRef(false);
+  const dragStartX = React.useRef(0);
+  const dragStartPos = React.useRef(0);
+  const isPaused = React.useRef(false);
+  const stripRef = React.useRef(null);
+  const [lightboxIndex, setLightboxIndex] = React.useState(null);
+
+  const SPEED = 1.4;
+  const GAP = 6;
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const tick = () => {
+      if (!isPaused.current && !dragging.current) {
+        posRef.current += SPEED;
+        const half = track.scrollWidth / 2;
+        if (posRef.current >= half) posRef.current = 0;
+        track.style.transform = `translateX(${-posRef.current}px)`;
+      }
+      animRef.current = requestAnimationFrame(tick);
+    };
+    animRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animRef.current);
+  }, []);
+
+  React.useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        const track = trackRef.current;
+        const half = track.scrollWidth / 2;
+        let next = posRef.current + e.deltaX;
+        if (next < 0) next = 0;
+        if (next >= half) next = half - 1;
+        posRef.current = next;
+        track.style.transform = `translateX(${-posRef.current}px)`;
+      }
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  const onMouseEnter = () => { isPaused.current = true; };
+  const onMouseLeave = () => { if (!dragging.current) isPaused.current = false; };
+  const onMouseDown = (e) => { dragging.current = true; dragStartX.current = e.clientX; dragStartPos.current = posRef.current; e.preventDefault(); };
+  const onMouseMove = (e) => {
+    if (!dragging.current) return;
+    const delta = dragStartX.current - e.clientX;
+    const track = trackRef.current;
+    const half = track.scrollWidth / 2;
+    let next = dragStartPos.current + delta;
+    if (next < 0) next = 0;
+    if (next >= half) next = half - 1;
+    posRef.current = next;
+    track.style.transform = `translateX(${-posRef.current}px)`;
+  };
+  const onMouseUp = () => { dragging.current = false; };
+
+  const openLightbox = (index) => { setLightboxIndex(index); document.body.style.overflow = 'hidden'; };
+  const closeLightbox = () => { setLightboxIndex(null); document.body.style.overflow = ''; isPaused.current = false; };
+  const prevImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i - 1 + images.length) % images.length); };
+  const nextImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i + 1) % images.length); };
+
+  React.useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight') setLightboxIndex(i => (i + 1) % images.length);
+      if (e.key === 'ArrowLeft') setLightboxIndex(i => (i - 1 + images.length) % images.length);
+      if (e.key === 'Escape') closeLightbox();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxIndex]);
+
+  React.useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) return;
+    if (lightboxIndex !== null) {
+      root.style.filter = 'blur(14px)';
+      root.style.transform = 'scale(0.97)';
+      root.style.transition = 'filter 0.4s ease, transform 0.4s ease';
+    } else {
+      root.style.filter = '';
+      root.style.transform = '';
+    }
+  }, [lightboxIndex]);
+
+  const Lightbox = () => createPortal(
+    <div onClick={closeLightbox} style={{
+      position: 'fixed', inset: 0, zIndex: 9999,
+      background: 'rgba(0,0,0,0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '40px', animation: 'fadeIn 0.35s ease',
+    }}>
+      <button onClick={closeLightbox} style={{
+        position: 'absolute', top: '24px', right: '28px',
+        background: 'none', border: 'none', color: '#fff',
+        fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
+        textTransform: 'uppercase', cursor: 'pointer',
+        opacity: 0.5, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.2s',
+      }}
+        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+        onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
+      >ESC</button>
+      <div style={{
+        position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
+        fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
+        color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
+      }}>{lightboxIndex + 1} / {images.length}</div>
+      <button onClick={prevImage} style={{
+        position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+      }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+      >←</button>
+      <div onClick={e => e.stopPropagation()} style={{
+        width: '100%', maxWidth: '1100px', aspectRatio: '2.39 / 1',
+        overflow: 'hidden', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
+      }}>
+        <img key={lightboxIndex} src={images[lightboxIndex]}
+          alt={`Still ${lightboxIndex + 1}`}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', animation: 'fadeIn 0.3s ease' }}
+        />
+      </div>
+      <button onClick={nextImage} style={{
+        position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+      }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+      >→</button>
+      <div style={{
+        position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
+        display: 'flex', gap: '6px', alignItems: 'center',
+      }}>
+        {images.map((_, i) => (
+          <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
+            width: i === lightboxIndex ? '20px' : '4px', height: '2px',
+            background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
+            cursor: 'pointer', transition: 'all 0.3s ease',
+          }} />
+        ))}
+      </div>
+    </div>,
+    document.body
+  );
+
+  return (
+    <>
+      <div ref={stripRef} style={{
+        overflow: 'hidden', width: '100%', margin: '40px 0',
+        cursor: 'grab', userSelect: 'none',
+        maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
+      }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+      >
+        <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
+          {[...images, ...images].map((src, i) => (
+            <div key={i} onClick={() => openLightbox(i % images.length)}
+              style={{
+                flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
+                aspectRatio: '2.39 / 1', overflow: 'hidden',
+                position: 'relative', cursor: 'pointer',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.querySelector('img').style.transform = 'scale(1.06)';
+                e.currentTarget.querySelector('div').style.opacity = '0';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.querySelector('img').style.transform = 'scale(1)';
+                e.currentTarget.querySelector('div').style.opacity = '1';
+              }}
+            >
+              <img src={src} alt={`Still ${(i % images.length) + 1}`} draggable={false}
+                style={{
+                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  pointerEvents: 'none',
+                  transition: 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                }}
+              />
+              <div style={{
+                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)',
+                transition: 'opacity 0.5s ease', pointerEvents: 'none',
+              }} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {lightboxIndex !== null && <Lightbox />}
+    </>
+  );
+};
+
 // ─── Hero ─────────────────────────────────────────────────────
 const HeroSection = ({ onBook }) => {
   const [loaded, setLoaded] = React.useState(false);
@@ -368,16 +581,13 @@ const AboutSection = () => {
   const ValueRow = ({ item }) => {
     const [h, setH] = React.useState(false);
     return (
-      <div
-        onMouseEnter={() => setH(true)}
-        onMouseLeave={() => setH(false)}
-        style={{
-          display: 'flex', alignItems: 'baseline', gap: '20px',
-          padding: '18px 0', cursor: 'default',
-          borderBottom: '1px solid',
-          borderColor: h ? 'rgba(var(--fg-rgb),0.18)' : 'rgba(var(--fg-rgb),0.06)',
-          transition: 'border-color 0.3s ease',
-        }}>
+      <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)} style={{
+        display: 'flex', alignItems: 'baseline', gap: '20px',
+        padding: '18px 0', cursor: 'default',
+        borderBottom: '1px solid',
+        borderColor: h ? 'rgba(var(--fg-rgb),0.18)' : 'rgba(var(--fg-rgb),0.06)',
+        transition: 'border-color 0.3s ease',
+      }}>
         <span style={{
           fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em',
           minWidth: '100px', display: 'inline-block',
@@ -423,9 +633,7 @@ const ServicesSection = () => {
   const ServiceItem = ({ item }) => {
     const [h, setH] = React.useState(false);
     return (
-      <div
-        onMouseEnter={() => setH(true)}
-        onMouseLeave={() => setH(false)}
+      <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
         style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'default' }}>
         <div style={{
           width: '3px', height: '3px', borderRadius: '50%', flexShrink: 0,
@@ -484,230 +692,29 @@ const ServicesSection = () => {
   );
 };
 
-// ─── Soul Film Strip ──────────────────────────────────────────
-const SoulFilmStrip = () => {
-  const images = [
-    'assets/soul-1.jpg', 'assets/soul-2.jpg', 'assets/soul-3.jpg',
-    'assets/soul-4.jpg', 'assets/soul-5.jpg', 'assets/soul-6.jpg',
-    'assets/soul-7.jpg', 'assets/soul-8.jpg', 'assets/soul-9.jpg',
-    'assets/soul-10.jpg',
-  ];
-
-  const trackRef = React.useRef(null);
-  const animRef = React.useRef(null);
-  const posRef = React.useRef(0);
-  const dragging = React.useRef(false);
-  const dragStartX = React.useRef(0);
-  const dragStartPos = React.useRef(0);
-  const isPaused = React.useRef(false);
-  const stripRef = React.useRef(null);
-  const [lightboxIndex, setLightboxIndex] = React.useState(null);
-
-  const SPEED = 1.4;
-  const GAP = 6;
-
-  React.useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const tick = () => {
-      if (!isPaused.current && !dragging.current) {
-        posRef.current += SPEED;
-        const half = track.scrollWidth / 2;
-        if (posRef.current >= half) posRef.current = 0;
-        track.style.transform = `translateX(${-posRef.current}px)`;
-      }
-      animRef.current = requestAnimationFrame(tick);
-    };
-    animRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animRef.current);
-  }, []);
-
-  React.useEffect(() => {
-    const el = stripRef.current;
-    if (!el) return;
-    const onWheel = (e) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-        e.preventDefault();
-        const track = trackRef.current;
-        const half = track.scrollWidth / 2;
-        let next = posRef.current + e.deltaX;
-        if (next < 0) next = 0;
-        if (next >= half) next = half - 1;
-        posRef.current = next;
-        track.style.transform = `translateX(${-posRef.current}px)`;
-      }
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => el.removeEventListener('wheel', onWheel);
-  }, []);
-
-  const onMouseEnter = () => { isPaused.current = true; };
-  const onMouseLeave = () => { if (!dragging.current) isPaused.current = false; };
-  const onMouseDown = (e) => { dragging.current = true; dragStartX.current = e.clientX; dragStartPos.current = posRef.current; e.preventDefault(); };
-  const onMouseMove = (e) => {
-    if (!dragging.current) return;
-    const delta = dragStartX.current - e.clientX;
-    const track = trackRef.current;
-    const half = track.scrollWidth / 2;
-    let next = dragStartPos.current + delta;
-    if (next < 0) next = 0;
-    if (next >= half) next = half - 1;
-    posRef.current = next;
-    track.style.transform = `translateX(${-posRef.current}px)`;
-  };
-  const onMouseUp = () => { dragging.current = false; };
-
-  const openLightbox = (index) => { setLightboxIndex(index); document.body.style.overflow = 'hidden'; };
-  const closeLightbox = () => { setLightboxIndex(null); document.body.style.overflow = ''; isPaused.current = false; };
-  const prevImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i - 1 + images.length) % images.length); };
-  const nextImage = (e) => { e.stopPropagation(); setLightboxIndex(i => (i + 1) % images.length); };
-
-  React.useEffect(() => {
-    if (lightboxIndex === null) return;
-    const onKey = (e) => {
-      if (e.key === 'ArrowRight') setLightboxIndex(i => (i + 1) % images.length);
-      if (e.key === 'ArrowLeft') setLightboxIndex(i => (i - 1 + images.length) % images.length);
-      if (e.key === 'Escape') closeLightbox();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [lightboxIndex]);
-
-  React.useEffect(() => {
-    const root = document.getElementById('root');
-    if (!root) return;
-    if (lightboxIndex !== null) {
-      root.style.filter = 'blur(14px)';
-      root.style.transform = 'scale(0.97)';
-      root.style.transition = 'filter 0.4s ease, transform 0.4s ease';
-    } else {
-      root.style.filter = '';
-      root.style.transform = '';
-    }
-  }, [lightboxIndex]);
-
-  const Lightbox = () => createPortal(
-    <div onClick={closeLightbox} style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'rgba(0,0,0,0.4)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: '40px', animation: 'fadeIn 0.35s ease',
-    }}>
-      <button onClick={closeLightbox} style={{
-        position: 'absolute', top: '24px', right: '28px',
-        background: 'none', border: 'none', color: '#fff',
-        fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
-        textTransform: 'uppercase', cursor: 'pointer',
-        opacity: 0.5, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.2s',
-      }}
-        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-        onMouseLeave={e => e.currentTarget.style.opacity = '0.5'}
-      >ESC</button>
-      <div style={{
-        position: 'absolute', top: '28px', left: '50%', transform: 'translateX(-50%)',
-        fontSize: '11px', fontWeight: 500, letterSpacing: '0.22em',
-        color: 'rgba(255,255,255,0.5)', fontFamily: "'DM Sans', sans-serif",
-      }}>{lightboxIndex + 1} / {images.length}</div>
-      <button onClick={prevImage} style={{
-        position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
-        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
-        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
-      }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-      >←</button>
-      <div onClick={e => e.stopPropagation()} style={{
-        width: '100%', maxWidth: '1100px', aspectRatio: '2.39 / 1',
-        overflow: 'hidden', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
-      }}>
-        <img key={lightboxIndex} src={images[lightboxIndex]}
-          alt={`Soul Tour still ${lightboxIndex + 1}`}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', animation: 'fadeIn 0.3s ease' }}
-        />
-      </div>
-      <button onClick={nextImage} style={{
-        position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
-        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
-        color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
-      }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-      >→</button>
-      <div style={{
-        position: 'absolute', bottom: '28px', left: '50%', transform: 'translateX(-50%)',
-        display: 'flex', gap: '6px', alignItems: 'center',
-      }}>
-        {images.map((_, i) => (
-          <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
-            width: i === lightboxIndex ? '20px' : '4px', height: '2px',
-            background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
-            cursor: 'pointer', transition: 'all 0.3s ease',
-          }} />
-        ))}
-      </div>
-    </div>,
-    document.body
-  );
-
-  return (
-    <>
-      <div ref={stripRef} style={{
-        overflow: 'hidden', width: '100%', margin: '40px 0',
-        cursor: 'grab', userSelect: 'none',
-        maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
-        WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
-      }}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-      >
-        <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
-          {[...images, ...images].map((src, i) => (
-            <div key={i} onClick={() => openLightbox(i % images.length)}
-              style={{
-                flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
-                aspectRatio: '2.39 / 1', overflow: 'hidden',
-                position: 'relative', cursor: 'pointer',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.querySelector('img').style.transform = 'scale(1.06)';
-                e.currentTarget.querySelector('div').style.opacity = '0';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.querySelector('img').style.transform = 'scale(1)';
-                e.currentTarget.querySelector('div').style.opacity = '1';
-              }}
-            >
-              <img src={src} alt={`Soul Tour still ${(i % images.length) + 1}`} draggable={false}
-                style={{
-                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
-                  pointerEvents: 'none',
-                  transition: 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                }}
-              />
-              <div style={{
-                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.15)',
-                transition: 'opacity 0.5s ease', pointerEvents: 'none',
-              }} />
-            </div>
-          ))}
-        </div>
-      </div>
-      {lightboxIndex !== null && <Lightbox />}
-    </>
-  );
-};
-
 // ─── Portfolio ────────────────────────────────────────────────
 const PortfolioSection = () => {
   useReveal();
   const [hovered, setHovered] = React.useState(null);
+
+  const soulImages = [
+    'assets/soul-1.jpg','assets/soul-2.jpg','assets/soul-3.jpg','assets/soul-4.jpg',
+    'assets/soul-5.jpg','assets/soul-6.jpg','assets/soul-7.jpg','assets/soul-8.jpg',
+    'assets/soul-9.jpg','assets/soul-10.jpg',
+  ];
+
+  const lttlImages = [
+    'assets/LTTL-1.jpg','assets/LTTL-2.jpg','assets/LTTL-3.jpg','assets/LTTL-4.jpg',
+    'assets/LTTL-5.jpg','assets/LTTL-6.jpg','assets/LTTL-7.jpg','assets/LTTL-8.jpg',
+    'assets/LTTL-9.jpg',
+  ];
+
+  const hfImages = [
+    'assets/HF-1.jpeg','assets/HF-2.jpeg','assets/HF-3.jpeg','assets/HF-4.jpeg',
+    'assets/HF-5.jpeg','assets/HF-6.jpeg','assets/HF-7.jpeg','assets/HF-8.jpeg',
+    'assets/HF-9.jpeg','assets/HF-10.jpeg',
+  ];
+
   const projects = [
     {
       title: 'Soul — Diversity',
@@ -715,7 +722,7 @@ const PortfolioSection = () => {
       year: '2026',
       detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
       quote: 'Films exploring humanity and human connection in a world full of AI — played on LED screens to 100,000+ people live.',
-      hasStrip: true,
+      images: soulImages,
     },
     {
       title: 'Look to the Light',
@@ -723,7 +730,7 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Director of Photography & Producer · Paramount+ · Amazon Prime · Sky Store · Apple TV · YouTube',
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
-      hasStrip: false,
+      images: lttlImages,
     },
     {
       title: 'Hellfire the Film',
@@ -731,7 +738,7 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Quiet Media production',
       quote: '',
-      hasStrip: false,
+      images: hfImages,
     },
   ];
 
@@ -750,7 +757,6 @@ const PortfolioSection = () => {
               style={{
                 padding: 'clamp(28px,4vw,44px) clamp(24px,5vw,80px)',
                 borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
-                borderBottom: !project.hasStrip && i === projects.length - 1 ? '1px solid rgba(var(--fg-rgb),0.07)' : 'none',
                 transition: 'opacity 0.2s',
                 opacity: hovered !== null && hovered !== i ? 0.4 : 1,
               }}
@@ -773,8 +779,8 @@ const PortfolioSection = () => {
                 <span style={{ fontSize: '13px', color: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }}>{project.year}</span>
               </div>
             </div>
-            {project.hasStrip && <SoulFilmStrip />}
-            {project.hasStrip && <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)' }} />}
+            <FilmStrip images={project.images} id={`strip-${i}`} />
+            <div style={{ borderBottom: '1px solid rgba(var(--fg-rgb),0.07)' }} />
           </div>
         ))}
       </div>
