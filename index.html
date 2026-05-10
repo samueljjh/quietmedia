@@ -84,8 +84,8 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 56px;
-  height: 56px;
+  width: 28px;
+  height: 28px;
   z-index: 99998;
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -184,9 +184,9 @@
     c2.x += (target.x - c2.x) * L2; c2.y += (target.y - c2.y) * L2;
     c3.x += (target.x - c3.x) * L3; c3.y += (target.y - c3.y) * L3;
     el.style.background = `
-      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.045) 0%, transparent 100%),
-      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.025) 0%, transparent 100%),
-      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.012) 0%, transparent 100%)
+      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.022) 0%, transparent 100%),
+      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.012) 0%, transparent 100%),
+      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.006) 0%, transparent 100%)
     `;
     requestAnimationFrame(animate);
   }
