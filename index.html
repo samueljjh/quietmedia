@@ -168,32 +168,6 @@
   animate();
 })();
 
-// ─── Cursor atmosphere ────────────────────────────────────────
-(function() {
-  const el = document.getElementById('cursor-atmosphere');
-  let c1 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c2 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c3 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let target = { x: window.innerWidth/2, y: window.innerHeight/2 };
-
-  window.addEventListener('mousemove', e => { target.x = e.clientX; target.y = e.clientY; });
-
-  const L1 = 0.09, L2 = 0.05, L3 = 0.025;
-
-  function animate() {
-    c1.x += (target.x - c1.x) * L1; c1.y += (target.y - c1.y) * L1;
-    c2.x += (target.x - c2.x) * L2; c2.y += (target.y - c2.y) * L2;
-    c3.x += (target.x - c3.x) * L3; c3.y += (target.y - c3.y) * L3;
-    el.style.background = `
-      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.002) 0%, transparent 100%),
-      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.005) 0%, transparent 100%),
-      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.001) 0%, transparent 100%)
-    `;
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
-
 // ─── Page transition ──────────────────────────────────────────
 window.qmTransition = function(callback) {
   const overlay = document.getElementById('page-transition');
