@@ -80,7 +80,7 @@
 }
 [data-theme="light"] #cursor-atmosphere { opacity: 0; }
 
-#cursor-viewfinder {
+  #cursor-viewfinder {
   position: fixed;
   top: 0;
   left: 0;
@@ -91,6 +91,9 @@
   transform: translate(-50%, -50%);
   transition: opacity 0.3s ease;
   opacity: 0;
+  mix-blend-mode: difference;
+  filter: invert(1);
+}
 }
 #cursor-viewfinder.visible { opacity: 1; }
 #cursor-viewfinder svg {
