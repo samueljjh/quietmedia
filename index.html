@@ -43,45 +43,22 @@
 .stat-item.visible:nth-child(4) { animation-delay: 0.3s; }
 .stat-item.visible:nth-child(5) { animation-delay: 0.4s; }
 
-<script>
-(function() {
-  const el = document.getElementById('cursor-atmosphere');
+#cursor-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease;
+  background: radial-gradient(900px circle at 50% 50%, rgba(255,252,245,0.028) 0%, transparent 70%);
+}
+[data-theme="dark"] #cursor-atmosphere { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="cursor-atmosphere"></div>
+<div id="root"></div>
 
-  // Three layers at different lag speeds — creates water displacement feel
-  let c1 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c2 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c3 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let target = { x: window.innerWidth/2, y: window.innerHeight/2 };
-
-  window.addEventListener('mousemove', e => {
-    target.x = e.clientX;
-    target.y = e.clientY;
-  });
-
-  // Each layer has different lag — outer ripple trails furthest behind
-  const L1 = 0.09;  // closest to cursor, snappiest
-  const L2 = 0.05;  // middle ripple
-  const L3 = 0.025; // outer ripple, most lag
-
-  function animate() {
-    c1.x += (target.x - c1.x) * L1;
-    c1.y += (target.y - c1.y) * L1;
-    c2.x += (target.x - c2.x) * L2;
-    c2.y += (target.y - c2.y) * L2;
-    c3.x += (target.x - c3.x) * L3;
-    c3.y += (target.y - c3.y) * L3;
-
-    el.style.background = `
-      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.045) 0%, transparent 100%),
-      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.025) 0%, transparent 100%),
-      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.012) 0%, transparent 100%)
-    `;
-
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
-</script>
 <script>
 // Cursor atmosphere — runs outside React, no lag from virtual DOM
 (function() {
@@ -97,12 +74,12 @@
 
   // Lerp factor — lower = more lag = more liquid feel
   // 0.04 is very slow and heavy, 0.12 is quicker but still smooth
-  const LERP = 0.05;
+  const LERP = 0.055;
 
   function animate() {
     current.x += (target.x - current.x) * LERP;
     current.y += (target.y - current.y) * LERP;
-    el.style.background = `radial-gradient(600px circle at ${current.x}px ${current.y}px, rgba(255,252,245,0.03) 0%, transparent 70%)`;
+    el.style.background = `radial-gradient(900px circle at ${current.x}px ${current.y}px, rgba(255,252,245,0.028) 0%, transparent 70%)`;
     raf = requestAnimationFrame(animate);
   }
   animate();
@@ -395,7 +372,7 @@ const HeroSection = ({ onBook }) => {
             <h1 style={{ fontSize: 'clamp(56px, 9vw, 110px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#ffffff', lineHeight: 1.0, margin: 0 }}>quiet media</h1>
           </div>
           <p style={{ fontSize: 'clamp(13px, 1.4vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.42)', letterSpacing: '0.05em', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 44px' }}>
-            Boutique film production. Human stories, captured with craft and quiet precision.
+            Boutique film production. Human stories, told with craft and quiet precision.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s' }}
