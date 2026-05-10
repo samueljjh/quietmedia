@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>quiet media — boutique film production</title>
 <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('qm_theme') || 'dark');</script>
+
+<!-- LinkedIn / Open Graph meta tags -->
+<meta property="og:title" content="quiet media — boutique film production" />
+<meta property="og:description" content="Boutique film production. Human stories, told with craft and quiet precision." />
+<meta property="og:image" content="https://quietmediav1.netlify.app/assets/og-image.jpg" />
+<meta property="og:url" content="https://quietmedia.co.uk" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://quietmediav1.netlify.app/assets/og-image.jpg" />
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +24,17 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
+* { cursor: none !important; }
+
 @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pageOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes pageIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -43,47 +63,150 @@
 .stat-item.visible:nth-child(4) { animation-delay: 0.3s; }
 .stat-item.visible:nth-child(5) { animation-delay: 0.4s; }
 
+#page-transition {
+  position: fixed;
+  inset: 0;
+  background: #0A0A0A;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+}
+
 #cursor-atmosphere {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: 9997;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 1s ease;
-  background: radial-gradient(900px circle at 50% 50%, rgba(255,252,245,0.028) 0%, transparent 70%);
 }
-[data-theme="dark"] #cursor-atmosphere { opacity: 1; }
+[data-theme="light"] #cursor-atmosphere { opacity: 0; }
+
+#cursor-viewfinder {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 56px;
+  z-index: 99998;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+#cursor-viewfinder.visible { opacity: 1; }
+#cursor-viewfinder svg {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+#cursor-viewfinder.hovering svg { transform: scale(0.75); }
+#cursor-viewfinder.clicking svg { transform: scale(0.55); }
 </style>
 </head>
 <body>
+
+<!-- Page transition overlay -->
+<div id="page-transition"></div>
+
+<!-- Cursor atmosphere -->
 <div id="cursor-atmosphere"></div>
+
+<!-- Custom viewfinder cursor -->
+<div id="cursor-viewfinder">
+  <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Corner brackets -->
+    <path d="M4 16 L4 4 L16 4" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M40 4 L52 4 L52 16" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M4 40 L4 52 L16 52" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M52 40 L52 52 L40 52" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Centre circle -->
+    <circle cx="28" cy="28" r="9" stroke="rgba(255,255,255,0.55)" stroke-width="1" fill="none"/>
+    <!-- Centre dot -->
+    <circle cx="28" cy="28" r="1.5" fill="rgba(255,255,255,0.8)"/>
+  </svg>
+</div>
+
 <div id="root"></div>
 
 <script>
-// Cursor atmosphere — runs outside React, no lag from virtual DOM
+// ─── Cursor viewfinder ────────────────────────────────────────
 (function() {
-  const el = document.getElementById('cursor-atmosphere');
-  let current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  let target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  let raf;
+  const cursor = document.getElementById('cursor-viewfinder');
+  let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+  let tx = cx, ty = cy;
+  const LERP = 0.12;
 
-  window.addEventListener('mousemove', e => {
-    target.x = e.clientX;
-    target.y = e.clientY;
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    cursor.classList.add('visible');
   });
 
-  // Lerp factor — lower = more lag = more liquid feel
-  // 0.04 is very slow and heavy, 0.12 is quicker but still smooth
-  const LERP = 0.055;
+  document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
+
+  document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+  document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
+
+  // Hover detection on interactive elements
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('button, a, [role="button"], input, select, textarea, label')) {
+      cursor.classList.add('hovering');
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('button, a, [role="button"], input, select, textarea, label')) {
+      cursor.classList.remove('hovering');
+    }
+  });
 
   function animate() {
-    current.x += (target.x - current.x) * LERP;
-    current.y += (target.y - current.y) * LERP;
-    el.style.background = `radial-gradient(900px circle at ${current.x}px ${current.y}px, rgba(255,252,245,0.028) 0%, transparent 70%)`;
-    raf = requestAnimationFrame(animate);
+    cx += (tx - cx) * LERP;
+    cy += (ty - cy) * LERP;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    requestAnimationFrame(animate);
   }
   animate();
 })();
+
+// ─── Cursor atmosphere ────────────────────────────────────────
+(function() {
+  const el = document.getElementById('cursor-atmosphere');
+  let c1 = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  let c2 = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  let c3 = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  let target = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+  window.addEventListener('mousemove', e => { target.x = e.clientX; target.y = e.clientY; });
+
+  const L1 = 0.09, L2 = 0.05, L3 = 0.025;
+
+  function animate() {
+    c1.x += (target.x - c1.x) * L1; c1.y += (target.y - c1.y) * L1;
+    c2.x += (target.x - c2.x) * L2; c2.y += (target.y - c2.y) * L2;
+    c3.x += (target.x - c3.x) * L3; c3.y += (target.y - c3.y) * L3;
+    el.style.background = `
+      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.045) 0%, transparent 100%),
+      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.025) 0%, transparent 100%),
+      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.012) 0%, transparent 100%)
+    `;
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ─── Page transition ──────────────────────────────────────────
+window.qmTransition = function(callback) {
+  const overlay = document.getElementById('page-transition');
+  overlay.style.transition = 'opacity 0.25s ease';
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'all';
+  setTimeout(() => {
+    callback();
+    setTimeout(() => {
+      overlay.style.opacity = '0';
+      overlay.style.pointerEvents = 'none';
+    }, 80);
+  }, 250);
+};
 </script>
 
 <script type="text/babel">
@@ -230,7 +353,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         position: 'absolute', top: '24px', right: '28px',
         background: 'none', border: 'none', color: '#fff',
         fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
-        textTransform: 'uppercase', cursor: 'pointer',
+        textTransform: 'uppercase', cursor: 'none',
         opacity: 0.5, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.2s',
       }}
         onMouseEnter={e => e.currentTarget.style.opacity = '1'}
@@ -246,7 +369,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+        cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
       }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
@@ -265,7 +388,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+        cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
       }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
@@ -278,7 +401,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
           <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
             width: i === lightboxIndex ? '20px' : '4px', height: '2px',
             background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
-            cursor: 'pointer', transition: 'all 0.3s ease',
+            cursor: 'none', transition: 'all 0.3s ease',
           }} />
         ))}
       </div>
@@ -290,7 +413,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
     <>
       <div ref={stripRef} style={{
         overflow: 'hidden', width: '100%', margin: '40px 0',
-        cursor: 'grab', userSelect: 'none',
+        cursor: 'none', userSelect: 'none',
         maskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
         WebkitMaskImage: 'radial-gradient(ellipse 80% 100% at 50% 50%, black 40%, transparent 100%)',
       }}
@@ -306,7 +429,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
               style={{
                 flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
                 aspectRatio: '2.39 / 1', overflow: 'hidden',
-                position: 'relative', cursor: 'pointer',
+                position: 'relative', cursor: 'none',
               }}
               onMouseEnter={e => {
                 e.currentTarget.querySelector('img').style.transform = 'scale(1.06)';
@@ -341,7 +464,22 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
 const HeroSection = ({ onBook }) => {
   const [loaded, setLoaded] = React.useState(false);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
+  const videoRef = React.useRef(null);
+
   React.useEffect(() => { setTimeout(() => setLoaded(true), 80); }, []);
+
+  // Parallax on scroll
+  React.useEffect(() => {
+    const onScroll = () => {
+      if (videoRef.current) {
+        const y = window.scrollY;
+        videoRef.current.style.transform = `translate(-50%, calc(-50% + ${y * 0.35}px))`;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const openLightbox = () => { setLightboxOpen(true); document.body.style.overflow = 'hidden'; };
   const closeLightbox = () => { setLightboxOpen(false); document.body.style.overflow = ''; };
 
@@ -354,6 +492,7 @@ const HeroSection = ({ onBook }) => {
       }}>
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: lightboxOpen ? 0.08 : 1, transition: 'opacity 0.6s ease' }}>
           <iframe
+            ref={videoRef}
             src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&background=1&autoplay=1&loop=1&byline=0&title=0&muted=1"
             style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '177.78vh', minWidth: '100%', height: '56.25vw', minHeight: '100%', border: 'none' }}
             allow="autoplay; fullscreen" frameBorder="0"
@@ -375,11 +514,11 @@ const HeroSection = ({ onBook }) => {
             Boutique film production. Human stories, told with craft and quiet precision.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s' }}
+            <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >BOOK AN INTRO CALL</button>
-            <button onClick={openLightbox} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
+            <button onClick={openLightbox} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'none', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
             >
@@ -391,7 +530,7 @@ const HeroSection = ({ onBook }) => {
       </section>
       {lightboxOpen && (
         <div onClick={closeLightbox} style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'pointer', opacity: 0.6, lineHeight: 1 }}>✕</button>
+          <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'none', opacity: 0.6, lineHeight: 1 }}>✕</button>
           <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '1000px', aspectRatio: '16/9', position: 'relative' }}>
             <iframe src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&autoplay=1&title=0&byline=0&portrait=0"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
@@ -625,7 +764,7 @@ const AboutSection = () => {
     return (
       <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)} style={{
         display: 'flex', alignItems: 'baseline', gap: '20px',
-        padding: '18px 0', cursor: 'default',
+        padding: '18px 0', cursor: 'none',
         borderBottom: '1px solid',
         borderColor: h ? 'rgba(var(--fg-rgb),0.18)' : 'rgba(var(--fg-rgb),0.06)',
         transition: 'border-color 0.3s ease',
@@ -676,7 +815,7 @@ const ServicesSection = () => {
     const [h, setH] = React.useState(false);
     return (
       <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'default' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'none' }}>
         <div style={{
           width: '3px', height: '3px', borderRadius: '50%', flexShrink: 0,
           background: h ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.25)',
@@ -762,9 +901,7 @@ const PortfolioSection = () => {
       year: '2026',
       detail: '8 films · Directed by Samuel · Written by & starring Ashley Banjo · Sold out theatres nationwide',
       quote: 'Films exploring humanity and human connection in a world full of AI — played on LED screens to 100,000+ people live.',
-      images: soulImages,
-      direction: 'left',
-      speed: 1.4,
+      images: soulImages, direction: 'left', speed: 1.4,
     },
     {
       title: 'Look to the Light',
@@ -772,9 +909,7 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Director of Photography & Producer · Paramount+ · Amazon Prime · Sky Store · Apple TV · YouTube',
       quote: '"Its cinematography paints the stark contrasts of Eddie\'s life, capturing the shimmering allure and the shadowed consequences of fame." — Overly Honest Movie Reviews',
-      images: lttlImages,
-      direction: 'right',
-      speed: 1.1,
+      images: lttlImages, direction: 'right', speed: 1.1,
     },
     {
       title: 'Hellfire the Film',
@@ -782,9 +917,7 @@ const PortfolioSection = () => {
       year: '2023',
       detail: 'Quiet Media production',
       quote: '',
-      images: hfImages,
-      direction: 'left',
-      speed: 1.7,
+      images: hfImages, direction: 'left', speed: 1.7,
     },
   ];
 
@@ -848,11 +981,11 @@ const BookingCTASection = ({ onBook }) => {
           A 30-minute introductory call to understand your vision, answer questions, and explore how we can work together. No pressure, no obligation.
         </p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'pointer', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'none', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
-          <a href="mailto:tamy@quietmedia.co.uk" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'pointer', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
+          <a href="mailto:tamy@quietmedia.co.uk" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'none', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}
           >SEND AN EMAIL</a>
@@ -882,7 +1015,7 @@ const TeamPreviewSection = ({ onNavigate }) => {
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
           Two filmmakers who share a commitment to craft, collaboration, and telling stories that matter. Every project we take on, we treat as our own.
         </p>
-        <button onClick={() => onNavigate('team')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'pointer', transition: 'border-color 0.2s, color 0.2s' }}
+        <button onClick={() => onNavigate('team')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'none', transition: 'border-color 0.2s, color 0.2s' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.45)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.18)'; e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.55)'; }}
         >MEET THE TEAM</button>
@@ -947,7 +1080,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
           <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
             Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
           </p>
-          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'pointer', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
@@ -971,7 +1104,11 @@ const App = () => {
 
   const navigate = (p) => {
     if (p === 'book') { setBookingOpen(true); return; }
-    setPage(p); sessionStorage.setItem('qm_page', p); window.scrollTo({ top: 0 });
+    window.qmTransition(() => {
+      setPage(p);
+      sessionStorage.setItem('qm_page', p);
+      window.scrollTo({ top: 0 });
+    });
   };
 
   const openBook = () => setBookingOpen(true);
