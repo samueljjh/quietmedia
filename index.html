@@ -143,41 +143,6 @@
 
   document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
   document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
-  <script>
-(function() {
-  const MAGNETIC_STRENGTH = 0.35; // how much the button moves — 0.2 subtle, 0.5 strong
-  const MAGNETIC_RADIUS = 80;     // how close cursor needs to be in px to activate
-
-  function initMagnetic() {
-    const buttons = document.querySelectorAll('button, a');
-    buttons.forEach(btn => {
-      btn.addEventListener('mousemove', e => {
-        const rect = btn.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = e.clientX - cx;
-        const dy = e.clientY - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MAGNETIC_RADIUS) {
-          const tx = dx * MAGNETIC_STRENGTH;
-          const ty = dy * MAGNETIC_STRENGTH;
-          btn.style.transform = `translate(${tx}px, ${ty}px)`;
-          btn.style.transition = 'transform 0.15s ease';
-        }
-      });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = 'translate(0, 0)';
-        btn.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
-      });
-    });
-  }
-
-  // Run after page loads and re-run when React renders new buttons
-  window.addEventListener('load', initMagnetic);
-  // Re-init periodically to catch React-rendered buttons
-  setInterval(initMagnetic, 2000);
-})();
-</script>
 
   // Hover detection on interactive elements
   document.addEventListener('mouseover', e => {
