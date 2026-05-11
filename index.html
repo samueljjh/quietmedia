@@ -24,8 +24,6 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <style>
-* { cursor: none !important; }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -81,26 +79,123 @@
 [data-theme="light"] #cursor-atmosphere { opacity: 0; }
 
 #cursor-viewfinder {
+  --cursor-width: 20px;
+  --cursor-height: 20px;
+  --corner-size: 6px;
+  --corner-offset: 0px;
   position: fixed;
   top: 0;
   left: 0;
-  width: 28px;
-  height: 28px;
+  width: var(--cursor-width);
+  height: var(--cursor-height);
   z-index: 99998;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
+  transform: translate3d(-50%, -50%, 0);
   opacity: 0;
   mix-blend-mode: difference;
+  will-change: transform, width, height, opacity;
+  transition: opacity 0.25s ease, width 0.42s cubic-bezier(0.16,1,0.3,1), height 0.42s cubic-bezier(0.16,1,0.3,1);
 }
 #cursor-viewfinder.visible { opacity: 1; }
-#cursor-viewfinder svg {
-  width: 100%;
-  height: 100%;
-  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+#cursor-viewfinder::before,
+#cursor-viewfinder::after,
+#cursor-viewfinder .corner-bottom-left,
+#cursor-viewfinder .corner-bottom-right {
+  content: '';
+  position: absolute;
+  width: var(--corner-size);
+  height: var(--corner-size);
+  border-color: #fff;
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.92;
+  transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.28s ease;
 }
-#cursor-viewfinder.hovering svg { transform: scale(0.75); }
-#cursor-viewfinder.clicking svg { transform: scale(0.55); }
+#cursor-viewfinder::before {
+  top: var(--corner-offset);
+  left: var(--corner-offset);
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+#cursor-viewfinder::after {
+  top: var(--corner-offset);
+  right: var(--corner-offset);
+  border-top-width: 1px;
+  border-right-width: 1px;
+}
+#cursor-viewfinder .corner-bottom-left {
+  bottom: var(--corner-offset);
+  left: var(--corner-offset);
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+#cursor-viewfinder .corner-bottom-right {
+  right: var(--corner-offset);
+  bottom: var(--corner-offset);
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+#cursor-viewfinder .cursor-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(3px);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.16,1,0.3,1);
+}
+#cursor-viewfinder.has-label .cursor-label {
+  opacity: 0.9;
+  transform: translateX(-50%) translateY(0);
+}
+#cursor-viewfinder.locking::before { animation: cursorLockTL 0.42s cubic-bezier(0.16,1,0.3,1); }
+#cursor-viewfinder.locking::after { animation: cursorLockTR 0.42s cubic-bezier(0.16,1,0.3,1); }
+#cursor-viewfinder.locking .corner-bottom-left { animation: cursorLockBL 0.42s cubic-bezier(0.16,1,0.3,1); }
+#cursor-viewfinder.locking .corner-bottom-right { animation: cursorLockBR 0.42s cubic-bezier(0.16,1,0.3,1); }
+#cursor-viewfinder.clicking::before { transform: translate3d(2px, 2px, 0); }
+#cursor-viewfinder.clicking::after { transform: translate3d(-2px, 2px, 0); }
+#cursor-viewfinder.clicking .corner-bottom-left { transform: translate3d(2px, -2px, 0); }
+#cursor-viewfinder.clicking .corner-bottom-right { transform: translate3d(-2px, -2px, 0); }
+
+@keyframes cursorLockTL {
+  0% { transform: translate3d(-5px, -5px, 0); opacity: 0.3; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.92; }
+}
+@keyframes cursorLockTR {
+  0% { transform: translate3d(5px, -5px, 0); opacity: 0.3; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.92; }
+}
+@keyframes cursorLockBL {
+  0% { transform: translate3d(-5px, 5px, 0); opacity: 0.3; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.92; }
+}
+@keyframes cursorLockBR {
+  0% { transform: translate3d(5px, 5px, 0); opacity: 0.3; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.92; }
+}
+
+@media (pointer: fine) {
+  html,
+  body,
+  a,
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea,
+  label,
+  [data-cursor] { cursor: none; }
+}
+@media (pointer: coarse), (hover: none) {
+  #cursor-viewfinder { display: none; }
+}
 </style>
 </head>
 <body>
@@ -108,16 +203,10 @@
 <div id="page-transition"></div>
 <div id="cursor-atmosphere"></div>
 
-<div id="cursor-viewfinder">
-  <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M4 16 L4 4 L16 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M40 4 L52 4 L52 16" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M4 40 L4 52 L16 52" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M52 40 L52 52 L40 52" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <foreignObject x="16" y="16" width="16" height="16">
-      <div xmlns="http://www.w3.org/1999/xhtml" style="width:16px;height:16px;background:white;mask-image:url(assets/logo.svg);-webkit-mask-image:url(assets/logo.svg);mask-size:contain;-webkit-mask-size:contain;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;mask-position:center;-webkit-mask-position:center;"></div>
-    </foreignObject>
-  </svg>
+<div id="cursor-viewfinder" aria-hidden="true">
+  <span class="cursor-label"></span>
+  <span class="corner-bottom-left"></span>
+  <span class="corner-bottom-right"></span>
 </div>
 
 <div id="root"></div>
@@ -125,39 +214,101 @@
 <script>
 // ─── Cursor viewfinder ─────────────────────────────────────────
 (function() {
+  const finePointer = window.matchMedia('(pointer: fine) and (hover: hover)');
   const cursor = document.getElementById('cursor-viewfinder');
-  let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-  let tx = cx, ty = cy;
-  const LERP = 0.28;
+  if (!cursor || !finePointer.matches) return;
 
-  document.addEventListener('mousemove', e => {
-    tx = e.clientX; ty = e.clientY;
+  const label = cursor.querySelector('.cursor-label');
+  const interactiveSelector = 'a, button, [role="button"], input, select, textarea, label, [data-cursor]';
+  const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  const current = { x: pointer.x, y: pointer.y, w: 20, h: 20 };
+  const target = { x: pointer.x, y: pointer.y, w: 20, h: 20 };
+  let activeEl = null;
+  let rafId = null;
+
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+  const shortText = (value) => {
+    if (!value) return '';
+    return value.replace(/\s+/g, ' ').trim().split(' ').slice(0, 3).join(' ').slice(0, 18);
+  };
+
+  const getLabel = (el) => {
+    if (!el) return '';
+    return shortText(el.dataset.cursor || el.getAttribute('aria-label') || el.textContent);
+  };
+
+  const pulse = () => {
+    cursor.classList.remove('locking');
+    void cursor.offsetWidth;
+    cursor.classList.add('locking');
+    window.setTimeout(() => cursor.classList.remove('locking'), 440);
+  };
+
+  const setActive = (el) => {
+    if (el === activeEl) return;
+    activeEl = el;
+    const text = getLabel(el);
+    label.textContent = text;
+    cursor.classList.toggle('has-label', Boolean(text));
+    if (el) pulse();
+  };
+
+  const updateTarget = () => {
+    if (activeEl && document.documentElement.contains(activeEl)) {
+      const rect = activeEl.getBoundingClientRect();
+      const padX = clamp(rect.width * 0.12, 8, 22);
+      const padY = clamp(rect.height * 0.22, 7, 16);
+      target.x = rect.left + rect.width / 2;
+      target.y = rect.top + rect.height / 2;
+      target.w = Math.max(20, rect.width + padX);
+      target.h = Math.max(20, rect.height + padY);
+    } else {
+      target.x = pointer.x;
+      target.y = pointer.y;
+      target.w = 20;
+      target.h = 20;
+    }
+  };
+
+  const animate = () => {
+    updateTarget();
+    const lock = Boolean(activeEl);
+    const speed = lock ? 0.24 : 0.32;
+    current.x += (target.x - current.x) * speed;
+    current.y += (target.y - current.y) * speed;
+    current.w += (target.w - current.w) * 0.22;
+    current.h += (target.h - current.h) * 0.22;
+
+    cursor.style.width = current.w + 'px';
+    cursor.style.height = current.h + 'px';
+    cursor.style.transform = `translate3d(${current.x - current.w / 2}px, ${current.y - current.h / 2}px, 0)`;
+    rafId = requestAnimationFrame(animate);
+  };
+
+  document.addEventListener('pointermove', (e) => {
+    pointer.x = e.clientX;
+    pointer.y = e.clientY;
     cursor.classList.add('visible');
-  });
+    setActive(e.target.closest(interactiveSelector));
+  }, { passive: true });
 
-  document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
-  document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
-  document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
-
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest('button, a, [role="button"], input, select, textarea, label')) {
-      cursor.classList.add('hovering');
+  document.addEventListener('pointerover', (e) => setActive(e.target.closest(interactiveSelector)), { passive: true });
+  document.addEventListener('pointerout', (e) => {
+    if (activeEl && (!e.relatedTarget || !activeEl.contains(e.relatedTarget))) {
+      setActive(null);
     }
-  });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest('button, a, [role="button"], input, select, textarea, label')) {
-      cursor.classList.remove('hovering');
-    }
-  });
+  }, { passive: true });
+  document.addEventListener('pointerleave', () => { cursor.classList.remove('visible'); setActive(null); }, { passive: true });
+  document.addEventListener('pointerdown', () => cursor.classList.add('clicking'), { passive: true });
+  document.addEventListener('pointerup', () => cursor.classList.remove('clicking'), { passive: true });
+  window.addEventListener('blur', () => { cursor.classList.remove('visible', 'clicking'); setActive(null); });
 
-  function animate() {
-    cx += (tx - cx) * LERP;
-    cy += (ty - cy) * LERP;
-    cursor.style.left = cx + 'px';
-    cursor.style.top = cy + 'px';
-    requestAnimationFrame(animate);
-  }
   animate();
+
+  finePointer.addEventListener?.('change', (e) => {
+    if (!e.matches && rafId) cancelAnimationFrame(rafId);
+  });
 })();
 
 // ─── Cursor atmosphere ─────────────────────────────────────────
@@ -177,9 +328,9 @@
     c2.x += (target.x - c2.x) * L2; c2.y += (target.y - c2.y) * L2;
     c3.x += (target.x - c3.x) * L3; c3.y += (target.y - c3.y) * L3;
     el.style.background = `
-      radial-gradient(180px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.022) 0%, transparent 100%),
-      radial-gradient(400px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.012) 0%, transparent 100%),
-      radial-gradient(700px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.006) 0%, transparent 100%)
+      radial-gradient(96px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.011) 0%, transparent 100%),
+      radial-gradient(208px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.006) 0%, transparent 100%),
+      radial-gradient(352px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.002) 0%, transparent 100%)
     `;
     requestAnimationFrame(animate);
   }
@@ -400,7 +551,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         position: 'absolute', top: '24px', right: '28px',
         background: 'none', border: 'none', color: '#fff',
         fontSize: '13px', fontWeight: 500, letterSpacing: '0.2em',
-        textTransform: 'uppercase', cursor: 'none',
+        textTransform: 'uppercase', cursor: 'inherit',
         opacity: 0.5, fontFamily: "'DM Sans', sans-serif", transition: 'opacity 0.2s',
       }}
         onMouseEnter={e => e.currentTarget.style.opacity = '1'}
@@ -416,7 +567,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+        cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
       }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
@@ -435,7 +586,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
         background: 'none', border: '1px solid rgba(255,255,255,0.2)',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
+        cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
       }}
         onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
@@ -448,7 +599,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
           <div key={i} onClick={e => { e.stopPropagation(); setLightboxIndex(i); }} style={{
             width: i === lightboxIndex ? '20px' : '4px', height: '2px',
             background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.25)',
-            cursor: 'none', transition: 'all 0.3s ease',
+            cursor: 'inherit', transition: 'all 0.3s ease',
           }} />
         ))}
       </div>
@@ -460,7 +611,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
     <>
       <div ref={stripRef} style={{
         overflow: 'hidden', width: '100%', margin: '40px 0',
-        cursor: 'none', userSelect: 'none',
+        cursor: 'inherit', userSelect: 'none',
       }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -470,11 +621,11 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4 }) => {
       >
         <div ref={trackRef} style={{ display: 'flex', gap: `${GAP}px`, width: 'max-content' }}>
           {[...images, ...images].map((src, i) => (
-            <div key={i} onClick={() => openLightbox(i % images.length)}
+            <div key={i} onClick={() => openLightbox(i % images.length)} data-cursor="view" role="button" aria-label={`View still ${(i % images.length) + 1}`}
               style={{
                 flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
                 aspectRatio: '2.39 / 1', overflow: 'hidden',
-                position: 'relative', cursor: 'none',
+                position: 'relative', cursor: 'inherit',
               }}
               onMouseEnter={e => {
                 e.currentTarget.querySelector('img').style.transform = 'scale(1.06)';
@@ -558,11 +709,11 @@ const HeroSection = ({ onBook }) => {
             Boutique film production. Human stories, told with craft and quiet precision.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s' }}
+            <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >BOOK AN INTRO CALL</button>
-            <button onClick={openLightbox} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'none', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
+            <button onClick={openLightbox} data-cursor="play" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
             >
@@ -574,7 +725,7 @@ const HeroSection = ({ onBook }) => {
       </section>
       {lightboxOpen && (
         <div onClick={closeLightbox} style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'none', opacity: 0.6, lineHeight: 1 }}>✕</button>
+          <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'inherit', opacity: 0.6, lineHeight: 1 }}>✕</button>
           <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '1000px', aspectRatio: '16/9', position: 'relative' }}>
             <iframe src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&autoplay=1&title=0&byline=0&portrait=0"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
@@ -808,7 +959,7 @@ const AboutSection = () => {
     return (
       <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)} style={{
         display: 'flex', alignItems: 'baseline', gap: '20px',
-        padding: '18px 0', cursor: 'none',
+        padding: '18px 0', cursor: 'inherit',
         borderBottom: '1px solid',
         borderColor: h ? 'rgba(var(--fg-rgb),0.18)' : 'rgba(var(--fg-rgb),0.06)',
         transition: 'border-color 0.3s ease',
@@ -859,7 +1010,7 @@ const ServicesSection = () => {
     const [h, setH] = React.useState(false);
     return (
       <div onMouseEnter={() => setH(true)} onMouseLeave={() => setH(false)}
-        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'none' }}>
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'inherit' }}>
         <div style={{
           width: '3px', height: '3px', borderRadius: '50%', flexShrink: 0,
           background: h ? 'rgba(var(--fg-rgb),0.7)' : 'rgba(var(--fg-rgb),0.25)',
@@ -1025,11 +1176,11 @@ const BookingCTASection = ({ onBook }) => {
           A 30-minute introductory call to understand your vision, answer questions, and explore how we can work together. No pressure, no obligation.
         </p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'none', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
-          <a href="mailto:tamy@quietmedia.co.uk" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'none', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
+          <a href="mailto:tamy@quietmedia.co.uk" data-cursor="email" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'inherit', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}
           >SEND AN EMAIL</a>
@@ -1059,7 +1210,7 @@ const TeamPreviewSection = ({ onNavigate }) => {
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
           Two filmmakers who share a commitment to craft, collaboration, and telling stories that matter. Every project we take on, we treat as our own.
         </p>
-        <button onClick={() => onNavigate('team')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'none', transition: 'border-color 0.2s, color 0.2s' }}
+        <button onClick={() => onNavigate('team')} data-cursor="meet" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.45)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.18)'; e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.55)'; }}
         >MEET THE TEAM</button>
@@ -1124,7 +1275,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
           <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
             Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
           </p>
-          <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
