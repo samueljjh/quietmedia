@@ -261,7 +261,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
   return (
     <div style={{ minHeight: '100vh' }}>
 
-      {/* Hero image strip */}
+      {/* Hero video strip */}
       <div
         style={{
           width: '100%',
@@ -271,9 +271,13 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
           background: '#0a0a0a',
         }}
       >
-        <img
-          src="assets/soul-1.jpg"
-          alt="SOUL — Diversity"
+        <video
+          src="assets/soul-hero-loop.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label="SOUL — Diversity tour film sequence"
           style={{
             width: '100%',
             height: '100%',
