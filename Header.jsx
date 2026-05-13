@@ -27,6 +27,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
   const navItems = [
     { id: 'home', label: 'HOME' },
     { id: 'work', label: 'OUR WORK' },
+    { id: 'case-studies', label: 'CASE STUDIES' },
     { id: 'about', label: 'ABOUT' },
     { id: 'team', label: 'MEET THE TEAM' },
   ];

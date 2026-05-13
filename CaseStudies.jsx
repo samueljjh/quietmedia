@@ -1,7 +1,7 @@
 // CaseStudies.jsx — Quiet Media
 
 // ─── Case Studies Section (homepage / work page preview) ─────
-const CaseStudiesSection = ({ onNavigate }) => {
+const CaseStudiesSection = ({ onNavigate, hideHeader }) => {
   useReveal();
   const [hovered, setHovered] = React.useState(null);
 
@@ -26,16 +26,17 @@ const CaseStudiesSection = ({ onNavigate }) => {
       pullQuote: '"Its cinematography paints the stark contrasts of Eddie\'s life."',
       pullSource: 'Overly Honest Movie Reviews',
     },
-    {
-      id: 'sophie-conran',
-      eyebrow: 'BRAND RETAINER',
-      title: 'Sophie Conran',
-      headline: '68% revenue growth. 250k to 340k followers.',
-      detail: 'Retained content partner · Brand identity films · Social content',
-      year: 'Ongoing',
-      pullQuote: null,
-      pullSource: null,
-    },
+    // Hidden pending client approval on stats
+    // {
+    //   id: 'sophie-conran',
+    //   eyebrow: 'BRAND RETAINER',
+    //   title: 'Sophie Conran',
+    //   headline: '68% revenue growth. 250k to 340k followers.',
+    //   detail: 'Retained content partner · Brand identity films · Social content',
+    //   year: 'Ongoing',
+    //   pullQuote: null,
+    //   pullSource: null,
+    // },
   ];
 
   return (
@@ -47,7 +48,7 @@ const CaseStudiesSection = ({ onNavigate }) => {
       }}
     >
       {/* Section header */}
-      <div
+      {!hideHeader && <div
         className="reveal"
         style={{
           marginBottom: 'clamp(36px,5vw,56px)',
@@ -77,7 +78,7 @@ const CaseStudiesSection = ({ onNavigate }) => {
         >
           The work, in detail.
         </h2>
-      </div>
+      </div>}
 
       {/* Cards */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -297,7 +298,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
         }}
       >
         <button
-          onClick={() => onNavigate('work')}
+          onClick={() => onNavigate('case-studies')}
           style={{
             background: 'none',
             border: 'none',
@@ -318,7 +319,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
           onMouseEnter={e => (e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.65)')}
           onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.3)')}
         >
-          ← OUR WORK
+          ← CASE STUDIES
         </button>
 
         <div className="reveal">
@@ -897,4 +898,192 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
   );
 };
 
-Object.assign(window, { CaseStudiesSection, CaseStudySoulPage });
+// ─── Shared back button style ─────────────────────────────────
+const backBtn = (onNavigate, dest) => (
+  <button
+    onClick={() => onNavigate(dest)}
+    style={{
+      background: 'none', border: 'none', fontSize: '10px', fontWeight: 500,
+      letterSpacing: '0.22em', textTransform: 'uppercase',
+      color: 'rgba(var(--fg-rgb),0.3)', cursor: 'none', padding: 0,
+      marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '8px',
+      fontFamily: "'DM Sans', sans-serif", transition: 'color 0.2s',
+    }}
+    onMouseEnter={e => (e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.65)')}
+    onMouseLeave={e => (e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.3)')}
+  >← CASE STUDIES</button>
+);
+
+const statsBar = (stats) => (
+  <section style={{
+    background: '#EDECE8', padding: 'clamp(32px,4vw,48px) clamp(24px,5vw,80px)',
+    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: '2px', borderBottom: '1px solid rgba(10,10,10,0.08)',
+  }}>
+    {stats.map((s, i) => (
+      <div key={i} style={{ padding: 'clamp(16px,2vw,24px)', borderLeft: i > 0 ? '1px solid rgba(10,10,10,0.08)' : 'none' }}>
+        <p style={{ fontSize: 'clamp(20px,2.5vw,30px)', fontWeight: 300, letterSpacing: '-0.5px', color: '#0A0A0A', marginBottom: '6px', lineHeight: 1 }}>{s.number}</p>
+        <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.4)' }}>{s.label}</p>
+      </div>
+    ))}
+  </section>
+);
+
+const caseCTA = (onNavigate, onBook) => (
+  <section style={{ background: '#EDECE8', padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)' }}>
+    <div className="reveal" style={{ maxWidth: '560px' }}>
+      <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>START A CONVERSATION</p>
+      <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.8px', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '32px' }}>Have a project in mind?</h2>
+      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>BOOK AN INTRO CALL</button>
+        <button onClick={() => onNavigate('case-studies')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '16px 36px', cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}>ALL CASE STUDIES</button>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── LTTL Case Study Page ─────────────────────────────────────
+const CaseStudyLTTLPage = ({ onNavigate, onBook }) => {
+  useReveal();
+  return (
+    <div style={{ minHeight: '100vh' }}>
+
+      {/* Header */}
+      <section style={{ padding: 'clamp(48px,7vw,88px) clamp(24px,5vw,80px) clamp(32px,4vw,56px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', marginTop: '68px' }}>
+        {backBtn(onNavigate, 'case-studies')}
+        <div className="reveal">
+          <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>FEATURE FILM · 2023</p>
+          <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-1.5px', color: 'var(--fg-primary)', lineHeight: 1.0, marginBottom: '20px' }}>Look to<br />the Light</h1>
+          <p style={{ fontSize: 'clamp(16px,2vw,22px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.5, maxWidth: '560px', letterSpacing: '-0.15px' }}>
+            From independent production to five major streaming platforms.
+          </p>
+        </div>
+      </section>
+
+      {/* Stats */}
+      {statsBar([
+        { number: '5', label: 'Streaming platforms' },
+        { number: '2023', label: 'Release year' },
+        { number: 'Feature', label: 'Format' },
+        { number: 'UK', label: 'Production' },
+      ])}
+
+      {/* Overview */}
+      <section style={{ padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', maxWidth: '780px' }}>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>OVERVIEW</p>
+          <p style={{ fontSize: 'clamp(16px,1.8vw,20px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.7)', lineHeight: 1.8, marginBottom: '24px' }}>
+            Look to the Light is an independent feature film produced, directed and edited by Samuel Hosier — later acquired and distributed across five major streaming platforms worldwide.
+          </p>
+          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.9 }}>
+            The film follows Eddie through a story critics noted for its stark visual contrasts and measured cinematography. From development through to delivery, the entire production was handled in-house by Quiet Media — from casting and locations to the final grade and platform submission.
+          </p>
+        </div>
+      </section>
+
+      {/* Film strip */}
+      <FilmStrip
+        images={['assets/LTTL-1.jpg','assets/LTTL-2.jpg','assets/LTTL-3.jpg','assets/LTTL-4.jpg','assets/LTTL-5.jpg','assets/LTTL-6.jpg','assets/LTTL-7.jpg','assets/LTTL-8.jpg','assets/LTTL-9.jpg']}
+        id="lttl-strip"
+        direction="left"
+        speed={1.2}
+      />
+
+      {/* Pull quote */}
+      <section style={{ padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+        <div className="reveal" style={{ maxWidth: '680px' }}>
+          <p style={{ fontSize: '26px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.1)', marginBottom: '16px', lineHeight: 1, fontFamily: "'DM Serif Display', serif", fontStyle: 'italic' }}>❝</p>
+          <p style={{ fontSize: 'clamp(18px,2.2vw,26px)', fontFamily: "'DM Serif Display', serif", fontStyle: 'italic', fontWeight: 400, color: 'rgba(var(--fg-rgb),0.55)', lineHeight: 1.6, marginBottom: '24px' }}>
+            Its cinematography paints the stark contrasts of Eddie's life.
+          </p>
+          <p style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.3)' }}>— Overly Honest Movie Reviews</p>
+        </div>
+      </section>
+
+      {/* Distribution */}
+      <section style={{ padding: 'clamp(48px,6vw,80px) clamp(24px,5vw,80px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>DISTRIBUTION</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
+            {['Paramount+', 'Amazon Prime', 'Sky Store', 'Apple TV', 'YouTube'].map((p, i) => (
+              <div key={i} style={{ padding: 'clamp(16px,2vw,22px) clamp(20px,2.5vw,36px)', background: 'var(--bg-secondary)', borderTop: '1px solid rgba(var(--fg-rgb),0.07)' }}>
+                <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.65)' }}>{p}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {caseCTA(onNavigate, onBook)}
+    </div>
+  );
+};
+
+// ─── Sophie Conran Case Study Page ───────────────────────────
+const CaseStudySophieConranPage = ({ onNavigate, onBook }) => {
+  useReveal();
+  return (
+    <div style={{ minHeight: '100vh' }}>
+
+      {/* Header */}
+      <section style={{ padding: 'clamp(48px,7vw,88px) clamp(24px,5vw,80px) clamp(32px,4vw,56px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', marginTop: '68px' }}>
+        {backBtn(onNavigate, 'case-studies')}
+        <div className="reveal">
+          <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>BRAND RETAINER · ONGOING</p>
+          <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-1.5px', color: 'var(--fg-primary)', lineHeight: 1.0, marginBottom: '20px' }}>Sophie<br />Conran</h1>
+          <p style={{ fontSize: 'clamp(16px,2vw,22px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.5, maxWidth: '560px', letterSpacing: '-0.15px' }}>
+            68% revenue growth. 250k to 340k followers.
+          </p>
+        </div>
+      </section>
+
+      {/* Stats */}
+      {statsBar([
+        { number: '68%', label: 'Revenue growth' },
+        { number: '340k', label: 'Followers reached' },
+        { number: '+90k', label: 'New followers' },
+        { number: 'Ongoing', label: 'Partnership' },
+      ])}
+
+      {/* Overview */}
+      <section style={{ padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', maxWidth: '780px' }}>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>OVERVIEW</p>
+          <p style={{ fontSize: 'clamp(16px,1.8vw,20px)', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.7)', lineHeight: 1.8, marginBottom: '24px' }}>
+            Quiet Media works with Sophie Conran as a retained content partner — creating brand identity films and social content that have driven measurable growth in both audience and revenue.
+          </p>
+          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.9 }}>
+            As an ongoing retainer, we handle the full creative and production pipeline: developing the visual language, directing shoots, editing content for social and web, and ensuring every piece lands consistently on-brand. The results speak for themselves.
+          </p>
+        </div>
+      </section>
+
+      {/* Two-col: What we do */}
+      <section className="two-col-grid" style={{ padding: 'clamp(64px,8vw,100px) clamp(24px,5vw,80px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)', alignItems: 'start', gap: 'clamp(40px,6vw,100px)' }}>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>THE BRIEF</p>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 300, letterSpacing: '-0.5px', color: 'var(--fg-primary)', lineHeight: 1.2, marginBottom: '20px' }}>Content that converts, not just content that looks good.</h2>
+          <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.9 }}>
+            Sophie Conran needed a content partner who understood both the aesthetic of the brand and the commercial reality behind it — someone who could produce consistently beautiful work that also moved product and grew the audience.
+          </p>
+        </div>
+        <div className="reveal">
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>OUR ROLE</p>
+          <h2 style={{ fontSize: 'clamp(22px,3vw,32px)', fontWeight: 300, letterSpacing: '-0.5px', color: 'var(--fg-primary)', lineHeight: 1.2, marginBottom: '20px' }}>Retained content partner.</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {['Brand identity films', 'Social content production', 'Visual language development', 'Shoot direction & editing', 'Platform-optimised delivery'].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '3px', height: '3px', borderRadius: '50%', flexShrink: 0, background: 'rgba(var(--fg-rgb),0.25)' }} />
+                <span style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.5)', lineHeight: 1.5 }}>{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {caseCTA(onNavigate, onBook)}
+    </div>
+  );
+};
+
+Object.assign(window, { CaseStudiesSection, CaseStudySoulPage, CaseStudyLTTLPage, CaseStudySophieConranPage });

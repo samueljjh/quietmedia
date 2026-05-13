@@ -847,47 +847,53 @@ const HeroSection = ({ onBook }) => {
 
 // ─── Client Strips ────────────────────────────────────────────
 const ClientStrips = () => {
-  const theme = document.documentElement.getAttribute('data-theme');
-  const isDark = theme !== 'light';
+  const [isDark, setIsDark] = React.useState(document.documentElement.getAttribute('data-theme') !== 'light');
+  React.useEffect(() => {
+    const obs = new MutationObserver(() => {
+      setIsDark(document.documentElement.getAttribute('data-theme') !== 'light');
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
   const logoFilter = isDark ? 'brightness(0) invert(1)' : 'brightness(0)';
 
   const strip1 = [
     { type: 'logo', slug: 'paramountplus', name: 'Paramount+' },
-    { type: 'text', name: 'Diversity' },
-    { type: 'logo', slug: 'amazonprime', name: 'Amazon Prime' },
-    { type: 'text', name: 'Louise Dearman' },
+    { type: 'url', url: 'assets/Amazon%20Prime%20LOGO.png', name: 'Amazon Prime' },
     { type: 'logo', slug: 'sky', name: 'Sky' },
-    { type: 'text', name: 'Ashley Banjo' },
+    { type: 'url', url: 'assets/Diversity%20LOGO.png', name: 'Diversity' },
     { type: 'logo', slug: 'appletv', name: 'Apple TV' },
-    { type: 'text', name: 'Move It' },
+    { type: 'url', url: 'assets/Dreams%20LOGO.png', name: 'Dreams' },
+    { type: 'url', url: 'assets/MOVE%20IT%20LOGO.png', name: 'Move It' },
+    { type: 'url', url: 'assets/Pep%26Co%20LOGO.png', name: 'Pep & Co', height: '44px' },
+    { type: 'url', url: 'assets/M%26S%20LOGO.png', name: 'M&S', height: '44px' },
+    { type: 'url', url: 'assets/F%26F%20LOGO.jpg', name: 'F&F' },
+    { type: 'url', url: 'assets/John%20Lewis%20LOGO.png', name: 'John Lewis', height: '44px' },
+    { type: 'url', url: 'assets/Optical%20Express%20LOGO.png', name: 'Optical Express', height: '44px' },
+    { type: 'url', url: 'assets/Junior%20Eurovision%20LOGO.png', name: 'Junior Eurovision' },
+    { type: 'url', url: 'assets/Tap%20Attack%20LOGO.png', name: 'Tap Attack' },
+    { type: 'url', url: 'assets/Sophie%20Conran%20LOGO.png', name: 'Sophie Conran', height: '44px' },
     { type: 'logo', slug: 'volkswagen', name: 'Volkswagen' },
-    { type: 'text', name: 'Junior Eurovision' },
-    { type: 'logo', slug: 'tesco', name: 'Tesco' },
-    { type: 'text', name: 'Kele Le Roc' },
-    { type: 'logo', slug: 'marksandspencer', name: 'M&S' },
-    { type: 'text', name: 'Queenz' },
-    { type: 'url', url: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/John_Lewis_%26_Partners_logo.svg', name: 'John Lewis' },
-    { type: 'text', name: 'Zoe Birkett' },
-    { type: 'text', name: 'Sophie Conran' },
-    { type: 'text', name: "Frankie's Guys" },
-    { type: 'text', name: 'International Collective' },
-    { type: 'text', name: 'MAZZA' },
+    { type: 'url', url: 'assets/Frankies%20Guys%20LOGO.png', name: "Frankie's Guys" },
+    { type: 'url', url: 'assets/Crowcon%20LOGO.png', name: 'Crowcon' },
+    { type: 'url', url: 'assets/International%20Collective%20LOGO.jpg', name: 'International Collective' },
+    { type: 'logo', slug: 'tesco', name: 'Tesco', height: '38px' },
   ];
 
   const strip2 = [
-    { type: 'text', name: 'Dreams' },
+    { type: 'text', name: 'Louise Dearman' },
+    { type: 'text', name: 'Ashley Banjo' },
+    { type: 'text', name: 'Kele Le Roc' },
+    { type: 'text', name: 'Queenz' },
+    { type: 'text', name: 'Zoe Birkett' },
+    { type: 'text', name: 'MAZZA' },
     { type: 'text', name: 'Wilkes Academy' },
-    { type: 'text', name: 'Pep & Co' },
     { type: 'text', name: 'Performers College' },
     { type: 'text', name: 'Six Senses' },
     { type: 'text', name: 'The Hammond' },
     { type: 'text', name: 'Aream & Co' },
     { type: 'text', name: 'Shockout Arts' },
-    { type: 'text', name: 'F&F' },
     { type: 'text', name: 'McLaren Dance Company' },
-    { type: 'text', name: 'Optical Express' },
-    { type: 'text', name: 'Tap Attack' },
-    { type: 'text', name: 'Crowcon' },
     { type: 'text', name: 'Diverse Dubai' },
     { type: 'text', name: 'David Michael Productions' },
     { type: 'text', name: 'Some Velvet Morning' },
@@ -916,10 +922,10 @@ const ClientStrips = () => {
     const brightColor = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.9)';
     return (
       <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
-        style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 44px' : '0 4px', flexShrink: 0 }}>
+        style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 36px' : '0 0px', flexShrink: 0 }}>
         {isImg ? (
           <img src={imgSrc} alt={item.name}
-            style={{ height: '40px', width: 'auto', maxWidth: '110px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
+            style={{ height: item.height || '28px', width: 'auto', maxWidth: '110px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
             onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: item.name, style: `font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;color:${dimColor};font-family:'DM Sans',sans-serif` })); }}
           />
         ) : (
@@ -927,21 +933,29 @@ const ClientStrips = () => {
             {item.name}
           </span>
         )}
-        {!isImg && <Dot />}
       </div>
     );
   };
 
-  const renderStrip = (items) => [...items, ...items].map((item, i) => <StripItem key={i} item={item} />);
+  const renderStrip = (items) => {
+    const doubled = [...items, ...items];
+    return doubled.map((item, i) => (
+      <React.Fragment key={i}>
+        <StripItem item={item} />
+        <Dot />
+      </React.Fragment>
+    ));
+  };
 
   return (
     <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0' }}>
-      <div style={{ padding: '32px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
+      <p style={{ padding: '16px clamp(24px,5vw,80px) 0', fontSize: '9px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', fontFamily: "'DM Sans', sans-serif" }}>Trusted by</p>
+      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
         <div className="client-strip">
           <div className="scroll-track-left" style={{ gap: '0' }}>{renderStrip(strip1)}</div>
         </div>
       </div>
-      <div style={{ padding: '20px 0' }}>
+      <div style={{ padding: '12px 0' }}>
         <div className="client-strip">
           <div className="scroll-track-right" style={{ gap: '0' }}>{renderStrip(strip2)}</div>
         </div>
@@ -1506,8 +1520,20 @@ const App = () => {
             <BookingCTASection onBook={openBook} />
           </>
         )}
+        {page === 'case-studies' && (
+          <>
+            <section style={{ padding: 'clamp(100px,12vw,160px) clamp(24px,5vw,80px) clamp(40px,5vw,64px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
+              <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '20px' }}>CASE STUDIES</p>
+              <h1 style={{ fontSize: 'clamp(40px,7vw,88px)', fontWeight: 300, letterSpacing: '-0.025em', color: 'var(--fg-primary)', lineHeight: 1.0 }}>The work,<br />in detail.</h1>
+            </section>
+            <CaseStudiesSection onNavigate={navigate} hideHeader />
+            <BookingCTASection onBook={openBook} />
+          </>
+        )}
         {page === 'team' && <TeamPage onNavigate={navigate} onBook={openBook} />}
         {page === 'case-study-soul' && <CaseStudySoulPage onNavigate={navigate} onBook={openBook} />}
+        {page === 'case-study-lttl' && <CaseStudyLTTLPage onNavigate={navigate} onBook={openBook} />}
+        {page === 'case-study-sophie-conran' && <CaseStudySophieConranPage onNavigate={navigate} onBook={openBook} />}
       </main>
       <QMFooter onNavigate={navigate} />
       <BookingModal isOpen={bookingOpen} onClose={() => setBookingOpen(false)} />
