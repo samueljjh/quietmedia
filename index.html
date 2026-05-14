@@ -858,26 +858,26 @@ const ClientStrips = () => {
   const logoFilter = isDark ? 'brightness(0) invert(1)' : 'brightness(0)';
 
   const strip1 = [
-    { type: 'logo', slug: 'paramountplus', name: 'Paramount+' },
-    { type: 'url', url: 'assets/Amazon%20Prime%20LOGO.png', name: 'Amazon Prime' },
-    { type: 'logo', slug: 'sky', name: 'Sky' },
+    { type: 'logo', slug: 'paramountplus', name: 'Paramount+', height: '42px' },
+    { type: 'url', url: 'assets/Amazon%20Prime%20LOGO.png', name: 'Amazon Prime', height: '42px' },
+    { type: 'logo', slug: 'sky', name: 'Sky', height: '38px' },
     { type: 'url', url: 'assets/Diversity%20LOGO.png', name: 'Diversity' },
-    { type: 'logo', slug: 'appletv', name: 'Apple TV' },
+    { type: 'logo', slug: 'appletv', name: 'Apple TV', height: '38px' },
     { type: 'url', url: 'assets/Dreams%20LOGO.png', name: 'Dreams' },
     { type: 'url', url: 'assets/MOVE%20IT%20LOGO.png', name: 'Move It' },
-    { type: 'url', url: 'assets/Pep%26Co%20LOGO.png', name: 'Pep & Co', height: '44px' },
+    { type: 'url', url: 'assets/Pep%26Co%20LOGO.png', name: 'Pep & Co', height: '80px' },
     { type: 'url', url: 'assets/M%26S%20LOGO.png', name: 'M&S', height: '44px' },
-    { type: 'url', url: 'assets/F%26F%20LOGO.jpg', name: 'F&F' },
-    { type: 'url', url: 'assets/John%20Lewis%20LOGO.png', name: 'John Lewis', height: '44px' },
+    { type: 'url', url: 'assets/F%26F%20LOGO.jpg?v=2', name: 'F&F', height: '110px' },
+    { type: 'url', url: 'assets/John%20Lewis%20LOGO.png', name: 'John Lewis', height: '80px' },
     { type: 'url', url: 'assets/Optical%20Express%20LOGO.png', name: 'Optical Express', height: '44px' },
     { type: 'url', url: 'assets/Junior%20Eurovision%20LOGO.png', name: 'Junior Eurovision' },
     { type: 'url', url: 'assets/Tap%20Attack%20LOGO.png', name: 'Tap Attack' },
-    { type: 'url', url: 'assets/Sophie%20Conran%20LOGO.png', name: 'Sophie Conran', height: '44px' },
+    { type: 'url', url: 'assets/Sophie%20Conran%20LOGO.png', name: 'Sophie Conran', height: '80px' },
     { type: 'logo', slug: 'volkswagen', name: 'Volkswagen' },
     { type: 'url', url: 'assets/Frankies%20Guys%20LOGO.png', name: "Frankie's Guys" },
     { type: 'url', url: 'assets/Crowcon%20LOGO.png', name: 'Crowcon' },
-    { type: 'url', url: 'assets/International%20Collective%20LOGO.jpg', name: 'International Collective' },
-    { type: 'logo', slug: 'tesco', name: 'Tesco', height: '38px' },
+    { type: 'url', url: 'assets/International%20Collective%20LOGO.png', name: 'International Collective', height: '100px' },
+    { type: 'logo', slug: 'tesco', name: 'Tesco', height: '50px' },
   ];
 
   const strip2 = [
@@ -925,7 +925,7 @@ const ClientStrips = () => {
         style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 36px' : '0 0px', flexShrink: 0 }}>
         {isImg ? (
           <img src={imgSrc} alt={item.name}
-            style={{ height: item.height || '28px', width: 'auto', maxWidth: '110px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
+            style={{ height: item.height || '28px', width: 'auto', maxWidth: '160px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
             onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: item.name, style: `font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;color:${dimColor};font-family:'DM Sans',sans-serif` })); }}
           />
         ) : (
@@ -948,19 +948,25 @@ const ClientStrips = () => {
   };
 
   return (
-    <section style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '0' }}>
-      <p style={{ padding: '16px clamp(24px,5vw,80px) 0', fontSize: '9px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', fontFamily: "'DM Sans', sans-serif" }}>Trusted by</p>
-      <div style={{ padding: '14px 0', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)' }}>
-        <div className="client-strip">
-          <div className="scroll-track-left" style={{ gap: '0' }}>{renderStrip(strip1)}</div>
-        </div>
+    <>
+      <div style={{ borderTop: '1px solid rgba(var(--fg-rgb),0.06)', background: 'var(--bg-primary)', padding: '14px clamp(24px,5vw,80px)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ width: '20px', height: '1px', background: 'rgba(var(--fg-rgb),0.2)', flexShrink: 0 }} />
+        <span style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.32)', whiteSpace: 'nowrap', fontFamily: "'DM Sans', sans-serif" }}>Trusted by</span>
+        <div style={{ flex: 1, height: '1px', background: 'rgba(var(--fg-rgb),0.07)' }} />
       </div>
-      <div style={{ padding: '12px 0' }}>
-        <div className="client-strip">
-          <div className="scroll-track-right" style={{ gap: '0' }}>{renderStrip(strip2)}</div>
+      <section style={{ background: 'var(--bg-primary)', padding: '0' }}>
+        <div style={{ height: '60px', borderBottom: '1px solid rgba(var(--fg-rgb),0.05)', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+          <div className="client-strip">
+            <div className="scroll-track-left" style={{ gap: '0' }}>{renderStrip(strip1)}</div>
+          </div>
         </div>
-      </div>
-    </section>
+        <div style={{ padding: '12px 0' }}>
+          <div className="client-strip">
+            <div className="scroll-track-right" style={{ gap: '0' }}>{renderStrip(strip2)}</div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
