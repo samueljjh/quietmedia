@@ -3,7 +3,7 @@
    quietmedia.co.uk · Founded 2020 · Wiltshire, UK
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+/* Fonts are loaded via <link> in index.html — no @import (render-blocking duplicate). */
 
 /* ─── Dark mode (default) ─────────────────────────────────── */
 :root {
@@ -77,8 +77,27 @@ body::after {
 
 /* ─── Form elements ───────────────────────────────────────── */
 input::placeholder, textarea::placeholder { color: rgba(var(--fg-rgb), 0.2); }
-input:focus, textarea:focus { outline: none; }
+input:focus:not(:focus-visible), textarea:focus:not(:focus-visible) { outline: none; }
 button { font-family: var(--font-sans); }
+
+/* ─── Keyboard focus ──────────────────────────────────────── */
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 1px solid rgba(var(--fg-rgb), 0.5);
+  outline-offset: 3px;
+}
+
+/* ─── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .stat-item { opacity: 1 !important; transform: none !important; }
+}
 
 /* ─── Mobile nav drawer ───────────────────────────────────── */
 .mobile-drawer {

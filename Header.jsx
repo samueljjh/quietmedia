@@ -111,7 +111,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
               }}>{item.label}</button>
             ))}
             <ThemeToggle />
-            <button onClick={() => onNavigate('book')} style={{
+            <button onClick={() => onNavigate('book')} data-magnetic style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
               color: onHeroDark ? '#0A0A0A' : 'var(--bg-primary)',

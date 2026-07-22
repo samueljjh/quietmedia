@@ -194,19 +194,11 @@ html[data-theme="light"] .portfolio-feature-image {
 #page-transition {
   position: fixed;
   inset: 0;
-  background: #0A0A0A;
+  background: var(--bg-primary);
   z-index: 99999;
   pointer-events: none;
   opacity: 0;
 }
-
-#cursor-atmosphere {
-  position: fixed;
-  inset: 0;
-  z-index: 9997;
-  pointer-events: none;
-}
-[data-theme="light"] #cursor-atmosphere { opacity: 0; }
 
 #cursor-viewfinder {
   --cursor-width: 20px;
@@ -331,7 +323,6 @@ html[data-theme="light"] .portfolio-feature-image {
 <body>
 
 <div id="page-transition"></div>
-<div id="cursor-atmosphere"></div>
 
 <div id="cursor-viewfinder" aria-hidden="true">
   <span class="cursor-label"></span>
@@ -441,62 +432,35 @@ html[data-theme="light"] .portfolio-feature-image {
   });
 })();
 
-// ─── Cursor atmosphere ─────────────────────────────────────────
+// ─── Magnetic CTA buttons (scoped via [data-magnetic]) ────────
 (function() {
-  const el = document.getElementById('cursor-atmosphere');
-  let c1 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c2 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let c3 = { x: window.innerWidth/2, y: window.innerHeight/2 };
-  let target = { x: window.innerWidth/2, y: window.innerHeight/2 };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!window.matchMedia('(pointer: fine) and (hover: hover)').matches) return;
+  const STRENGTH = 0.35;
+  const RADIUS = 80;
+  let active = null;
 
-  window.addEventListener('mousemove', e => { target.x = e.clientX; target.y = e.clientY; });
+  const reset = (el) => {
+    el.style.transform = 'translate(0, 0)';
+    el.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+  };
 
-  const L1 = 0.09, L2 = 0.05, L3 = 0.025;
-
-  function animate() {
-    c1.x += (target.x - c1.x) * L1; c1.y += (target.y - c1.y) * L1;
-    c2.x += (target.x - c2.x) * L2; c2.y += (target.y - c2.y) * L2;
-    c3.x += (target.x - c3.x) * L3; c3.y += (target.y - c3.y) * L3;
-    el.style.background = `
-      radial-gradient(96px circle at ${c1.x}px ${c1.y}px, rgba(255,252,245,0.011) 0%, transparent 100%),
-      radial-gradient(208px circle at ${c2.x}px ${c2.y}px, rgba(255,252,245,0.006) 0%, transparent 100%),
-      radial-gradient(352px circle at ${c3.x}px ${c3.y}px, rgba(255,252,245,0.002) 0%, transparent 100%)
-    `;
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
-
-// ─── Magnetic buttons ──────────────────────────────────────────
-(function() {
-  const MAGNETIC_STRENGTH = 0.35;
-  const MAGNETIC_RADIUS = 80;
-
-  function initMagnetic() {
-    document.querySelectorAll('button, a').forEach(btn => {
-      if (btn._magneticInit) return;
-      btn._magneticInit = true;
-      btn.addEventListener('mousemove', e => {
-        const rect = btn.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = e.clientX - cx;
-        const dy = e.clientY - cy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MAGNETIC_RADIUS) {
-          btn.style.transform = `translate(${dx * MAGNETIC_STRENGTH}px, ${dy * MAGNETIC_STRENGTH}px)`;
-          btn.style.transition = 'transform 0.15s ease';
-        }
-      });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = 'translate(0, 0)';
-        btn.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
-      });
-    });
-  }
-
-  window.addEventListener('load', initMagnetic);
-  setInterval(initMagnetic, 2000);
+  document.addEventListener('mousemove', (e) => {
+    const el = e.target.closest ? e.target.closest('[data-magnetic]') : null;
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
+      if (Math.sqrt(dx * dx + dy * dy) < RADIUS) {
+        if (active && active !== el) reset(active);
+        active = el;
+        el.style.transform = `translate(${dx * STRENGTH}px, ${dy * STRENGTH}px)`;
+        el.style.transition = 'transform 0.15s ease';
+        return;
+      }
+    }
+    if (active) { reset(active); active = null; }
+  }, { passive: true });
 })();
 
 // ─── Page transition ───────────────────────────────────────────
@@ -570,6 +534,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
   React.useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const tick = () => {
       if (!isPaused.current && !dragging.current) {
         const half = track.scrollWidth / 2;
@@ -767,7 +732,8 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
                 e.currentTarget.querySelector('div').style.opacity = '1';
               }}
             >
-              <img src={src} alt={`${label} still ${(i % images.length) + 1}`} draggable={false}
+              <img src={src.replace('assets/', 'assets/strips/')} alt={`${label} still ${(i % images.length) + 1}`} draggable={false}
+                loading="lazy" decoding="async"
                 style={{
                   width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                   pointerEvents: 'none',
@@ -796,6 +762,7 @@ const HeroSection = ({ onBook }) => {
   React.useEffect(() => { setTimeout(() => setLoaded(true), 80); }, []);
 
   React.useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const onScroll = () => {
       if (videoRef.current) {
         const y = window.scrollY;
@@ -824,28 +791,28 @@ const HeroSection = ({ onBook }) => {
             allow="autoplay; fullscreen" frameBorder="0"
           />
         </div>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.62) 100%)', pointerEvents: 'none' }} />
         <div style={{
           position: 'relative', zIndex: 2, textAlign: 'center',
           padding: '0 clamp(24px, 6vw, 80px)',
           opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(20px)',
           transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.2s',
         }}>
-          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: '28px' }}>WILTSHIRE, UK · EST. 2020</p>
+          <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '28px' }}>WILTSHIRE, UK · EST. 2020</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'clamp(16px, 2.5vw, 32px)', marginBottom: '28px' }}>
-            <QMark size={88} color="#ffffff" style={{ width: 'clamp(44px, 7vw, 88px)', height: 'clamp(44px, 7vw, 88px)', display: 'block', transform: 'translateY(6px)' }} />
+            <QMark size={88} color="#ffffff" style={{ width: 'clamp(32px, 7vw, 88px)', height: 'clamp(32px, 7vw, 88px)', display: 'block', transform: 'translateY(6px)' }} />
             <h1 className="sr-only">quiet media — film and video production company in Wiltshire, UK</h1>
-            <div style={{ fontSize: 'clamp(56px, 9vw, 110px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#ffffff', lineHeight: 1.0, margin: 0 }}>quiet media</div>
+            <div style={{ fontSize: 'clamp(40px, 9vw, 110px)', fontWeight: 300, letterSpacing: '-0.025em', color: '#ffffff', lineHeight: 1.0, margin: 0 }}>quiet media</div>
           </div>
-          <p style={{ fontSize: 'clamp(13px, 1.4vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.42)', letterSpacing: '0.05em', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 44px' }}>
+          <p style={{ fontSize: 'clamp(13px, 1.4vw, 16px)', fontWeight: 300, color: 'rgba(255,255,255,0.58)', letterSpacing: '0.05em', lineHeight: 1.7, maxWidth: '480px', margin: '0 auto 44px' }}>
             Boutique film production. Human stories, told with craft and quiet precision.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+            <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >BOOK AN INTRO CALL</button>
-            <button onClick={openLightbox} data-cursor="play" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
+            <button onClick={openLightbox} data-cursor="play" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
             >
@@ -881,26 +848,29 @@ const ClientStrips = () => {
   }, []);
   const logoFilter = isDark ? 'brightness(0) invert(1)' : 'brightness(0)';
 
+  // File logos are pre-trimmed (assets/logos/) so height = visible content height.
+  // Heights are set by logo aspect ratio for consistent optical size:
+  // wide wordmarks ~18-20px, medium ~24-26px, compact/stacked ~30-38px.
   const strip1 = [
     { type: 'logo', slug: 'paramountplus', name: 'Paramount+', height: '42px' },
-    { type: 'url', url: 'assets/Amazon%20Prime%20LOGO.png', name: 'Amazon Prime', height: '42px' },
+    { type: 'url', url: 'assets/logos/Amazon%20Prime.png', name: 'Amazon Prime', height: '38px' },
     { type: 'logo', slug: 'sky', name: 'Sky', height: '38px' },
-    { type: 'url', url: 'assets/Diversity%20LOGO.png', name: 'Diversity' },
+    { type: 'url', url: 'assets/logos/Diversity.png', name: 'Diversity', height: '20px' },
     { type: 'logo', slug: 'appletv', name: 'Apple TV', height: '38px' },
-    { type: 'url', url: 'assets/Dreams%20LOGO.png', name: 'Dreams' },
-    { type: 'url', url: 'assets/MOVE%20IT%20LOGO.png', name: 'Move It' },
-    { type: 'url', url: 'assets/Pep%26Co%20LOGO.png', name: 'Pep & Co', height: '80px' },
-    { type: 'url', url: 'assets/M%26S%20LOGO.png', name: 'M&S', height: '44px' },
-    { type: 'url', url: 'assets/F%26F%20LOGO.jpg?v=2', name: 'F&F', height: '110px' },
-    { type: 'url', url: 'assets/John%20Lewis%20LOGO.png', name: 'John Lewis', height: '80px' },
-    { type: 'url', url: 'assets/Optical%20Express%20LOGO.png', name: 'Optical Express', height: '44px' },
-    { type: 'url', url: 'assets/Junior%20Eurovision%20LOGO.png', name: 'Junior Eurovision' },
-    { type: 'url', url: 'assets/Tap%20Attack%20LOGO.png', name: 'Tap Attack' },
-    { type: 'url', url: 'assets/Sophie%20Conran%20LOGO.png', name: 'Sophie Conran', height: '80px' },
+    { type: 'url', url: 'assets/logos/Dreams.png', name: 'Dreams', height: '26px' },
+    { type: 'url', url: 'assets/logos/MOVE%20IT.png', name: 'Move It', height: '26px' },
+    { type: 'url', url: 'assets/logos/Pep%26Co.png', name: 'Pep & Co', height: '26px' },
+    { type: 'url', url: 'assets/logos/M%26S.png', name: 'M&S', height: '36px' },
+    { type: 'url', url: 'assets/logos/F%26F.png', name: 'F&F', height: '36px' },
+    { type: 'url', url: 'assets/logos/John%20Lewis.png', name: 'John Lewis', height: '20px' },
+    { type: 'url', url: 'assets/logos/Optical%20Express.png', name: 'Optical Express', height: '18px' },
+    { type: 'url', url: 'assets/logos/Junior%20Eurovision.png', name: 'Junior Eurovision', height: '32px' },
+    { type: 'url', url: 'assets/logos/Tap%20Attack.png', name: 'Tap Attack', height: '30px' },
+    { type: 'url', url: 'assets/logos/Sophie%20Conran.png', name: 'Sophie Conran', height: '18px' },
     { type: 'logo', slug: 'volkswagen', name: 'Volkswagen' },
-    { type: 'url', url: 'assets/Frankies%20Guys%20LOGO.png', name: "Frankie's Guys" },
-    { type: 'url', url: 'assets/Crowcon%20LOGO.png', name: 'Crowcon' },
-    { type: 'url', url: 'assets/International%20Collective%20LOGO.png', name: 'International Collective', height: '100px' },
+    { type: 'url', url: 'assets/logos/Frankies%20Guys.png', name: "Frankie's Guys", height: '20px' },
+    { type: 'url', url: 'assets/logos/Crowcon.png', name: 'Crowcon', height: '24px' },
+    { type: 'url', url: 'assets/logos/International%20Collective.png', name: 'International Collective', height: '20px' },
     { type: 'logo', slug: 'tesco', name: 'Tesco', height: '50px' },
   ];
 
@@ -948,7 +918,7 @@ const ClientStrips = () => {
       <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
         style={{ display: 'inline-flex', alignItems: 'center', padding: isImg ? '0 36px' : '0 0px', flexShrink: 0 }}>
         {isImg ? (
-          <img src={imgSrc} alt={item.name}
+          <img src={imgSrc} alt={item.name} loading="lazy" decoding="async"
             style={{ height: item.height || '28px', width: 'auto', maxWidth: '160px', objectFit: 'contain', display: 'block', opacity: hovered ? 0.9 : 0.25, transition: 'opacity 0.3s ease', filter: logoFilter }}
             onError={e => { e.target.replaceWith(Object.assign(document.createElement('span'), { textContent: item.name, style: `font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;color:${dimColor};font-family:'DM Sans',sans-serif` })); }}
           />
@@ -1048,7 +1018,7 @@ const StatsStrip = () => {
   };
 
   const stats = [
-    { number: '10M+', label: 'Online views generated' },
+    { number: '15M+', label: 'Online views generated' },
     { number: '100k+', label: 'Live audience' },
     { number: '5', label: 'Major streaming platforms' },
     { number: '40+', label: 'Clients worldwide' },
@@ -1396,11 +1366,11 @@ const BookingCTASection = ({ onBook }) => {
           A 30-minute introductory call to understand your vision, answer questions, and explore how we can work together. No pressure, no obligation.
         </p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
-          <a href="mailto:tamy@quietmedia.co.uk" data-cursor="email" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'inherit', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
+          <a href="mailto:tamy@quietmedia.co.uk" data-cursor="email" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'inherit', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}
           >SEND AN EMAIL</a>
@@ -1418,7 +1388,7 @@ const TeamPreviewSection = ({ onNavigate }) => {
       <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
         {[{ name: 'Samuel', src: 'assets/samuel.jpg' }, { name: 'Tamy', src: 'assets/tamy.jpg' }].map((person) => (
           <div key={person.name} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
-            <img src={person.src} alt={person.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+            <img src={person.src} alt={person.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           </div>
         ))}
       </div>
@@ -1430,7 +1400,7 @@ const TeamPreviewSection = ({ onNavigate }) => {
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
           Two filmmakers who share a commitment to craft, collaboration, and telling stories that matter. Every project we take on, we treat as our own.
         </p>
-        <button onClick={() => onNavigate('team')} data-cursor="meet" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s' }}
+        <button onClick={() => onNavigate('team')} data-cursor="meet" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.45)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.18)'; e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.55)'; }}
         >MEET THE TEAM</button>
@@ -1477,7 +1447,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
         {members.map((m, i) => (
           <div key={m.name} className="reveal two-col-grid" style={{ alignItems: 'start', padding: 'clamp(40px,5vw,64px) 0', borderBottom: i < members.length - 1 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none' }}>
             <div style={{ aspectRatio: '4/5', overflow: 'hidden', order: i % 2 === 1 ? 1 : 0 }}>
-              <img src={m.src} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+              <img src={m.src} alt={m.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
             </div>
             <div style={{ order: i % 2 === 1 ? 0 : 1, paddingTop: '8px' }}>
               <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.25)', marginBottom: '14px' }}>{m.role}</p>
@@ -1495,7 +1465,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
           <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
             Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
           </p>
-          <button onClick={onBook} data-cursor="book" style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
