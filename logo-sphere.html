@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Quiet Media — Logo Sphere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-primary: #0A0A0A;
+    --fg-primary: #FFFFFF;
+    --fg-rgb: 255, 255, 255;
+    --qm-cream: #EDECE8;
+    --font-sans: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html[data-theme="light"] {
+    --bg-primary: #F5F4F2;
+    --fg-primary: #0A0A0A;
+    --fg-rgb: 10, 10, 10;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    font-family: var(--font-sans);
+    font-weight: 300;
+    background: var(--bg-primary);
+    color: var(--fg-primary);
+    overflow-x: hidden;
+  }
+
+  /* film grain */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.035'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  .eyebrow {
+    display: flex; align-items: center; gap: 16px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase;
+    color: rgba(var(--fg-rgb), 0.32);
+  }
+  .eyebrow::before { content: ''; width: 20px; height: 1px; background: rgba(var(--fg-rgb), 0.2); flex-shrink: 0; }
+  .eyebrow::after { content: ''; flex: 1; height: 1px; background: rgba(var(--fg-rgb), 0.07); }
+
+  /* ─── scroll scaffolding (demo page only) ─────────────────── */
+  .spacer {
+    min-height: 70vh;
+    padding: clamp(24px, 5vw, 80px);
+    display: flex; flex-direction: column; justify-content: center; gap: 24px;
+  }
+  .spacer h1 {
+    font-weight: 300; letter-spacing: -0.02em; line-height: 1.05;
+    font-size: clamp(38px, 7vw, 84px); max-width: 14ch;
+  }
+  .spacer p {
+    font-size: 14px; line-height: 1.7; max-width: 46ch;
+    color: rgba(var(--fg-rgb), 0.45);
+  }
+  .hint { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(var(--fg-rgb), 0.28); }
+
+  /* ─── the sphere section ──────────────────────────────────── */
+  .sphere-section { height: 320vh; position: relative; }
+  .sphere-sticky {
+    position: sticky; top: 0;
+    height: 100vh; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%; height: 100%;
+    cursor: default;
+  }
+
+  .node {
+    position: absolute; top: 50%; left: 50%;
+    transform-origin: center center;
+    will-change: transform, opacity;
+    pointer-events: none;   /* hover is hit-tested in JS, not by the DOM */
+    -webkit-user-select: none; user-select: none;
+  }
+  .node img {
+    display: block; width: auto; max-width: 150px;
+    object-fit: contain;
+    -webkit-user-drag: none;
+  }
+  .node span {
+    display: block; white-space: nowrap;
+    font-size: 13px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--fg-primary);
+  }
+
+  /* readout */
+  .readout {
+    position: absolute; left: 50%; bottom: clamp(28px, 6vh, 56px);
+    transform: translateX(-50%);
+    text-align: center; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .readout .name {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase;
+    color: rgba(var(--fg-rgb), 0.9);
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+    min-height: 14px;
+  }
+  .readout .name.on { opacity: 1; transform: translateY(0); }
+  .readout .rule { width: 1px; height: 28px; background: linear-gradient(to bottom, rgba(var(--fg-rgb),0.25), transparent); }
+
+  .corner {
+    position: absolute; top: clamp(24px, 5vw, 56px); left: clamp(24px, 5vw, 56px);
+    right: clamp(24px, 5vw, 56px);
+  }
+
+  .theme-toggle {
+    position: fixed; right: 20px; bottom: 20px; z-index: 1001;
+    background: none; border: 1px solid rgba(var(--fg-rgb), 0.15);
+    color: rgba(var(--fg-rgb), 0.5); font-family: var(--font-sans);
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 9px 14px; cursor: pointer; transition: all 0.3s var(--ease-out);
+  }
+  .theme-toggle:hover { color: var(--fg-primary); border-color: rgba(var(--fg-rgb), 0.4); }
+
+  /* keep wide wordmarks inside the frame on narrower screens */
+  @media (max-width: 1099px) {
+    .node img { max-width: 120px; }
+    .node span { font-size: 12px; }
+  }
+  @media (max-width: 699px) {
+    .node img { max-width: 84px; }
+    .node span { font-size: 10px; letter-spacing: 0.12em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .readout .name { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<section class="spacer">
+  <div class="eyebrow">Trusted by</div>
+  <h1>A world of work.</h1>
+  <p>Scroll to turn it. Hold a logo to bring it forward.</p>
+</section>
+
+<section class="sphere-section">
+  <div class="sphere-sticky">
+    <div class="corner"><div class="eyebrow">Selected clients</div></div>
+    <div id="stage"></div>
+    <div class="readout">
+      <div class="name" id="readout-name"></div>
+      <div class="rule"></div>
+    </div>
+  </div>
+</section>
+
+<section class="spacer">
+  <div class="eyebrow">Next</div>
+  <h1>Let's make something quiet.</h1>
+  <p class="hint">End of demo — scroll back up to reverse the spin.</p>
+</section>
+
+<button class="theme-toggle" id="themeToggle">Light</button>
+
+<script>
+(function () {
+  'use strict';
+
+  // ─── Client list ────────────────────────────────────────────
+  // type 'url'  → local trimmed PNG in assets/logos/
+  // type 'icon' → simpleicons CDN (rendered white, then tinted by filter)
+  // type 'text' → wordmark set in DM Sans
+  var ITEMS = [
+    { type: 'icon', slug: 'paramountplus', name: 'Paramount+',  h: 46 },
+    { type: 'url',  url: 'assets/logos/Amazon%20Prime.png', name: 'Amazon Prime', h: 42 },
+    { type: 'icon', slug: 'sky',           name: 'Sky',          h: 42 },
+    { type: 'icon', slug: 'appletv',       name: 'Apple TV',     h: 40 },
+    { type: 'icon', slug: 'volkswagen',    name: 'Volkswagen',   h: 44 },
+    { type: 'icon', slug: 'tesco',         name: 'Tesco',        h: 52 },
+    { type: 'url',  url: 'assets/logos/Diversity.png',       name: 'Diversity',       h: 22 },
+    { type: 'url',  url: 'assets/logos/Dreams.png',          name: 'Dreams',          h: 28 },
+    { type: 'url',  url: 'assets/logos/MOVE%20IT.png',       name: 'Move It',         h: 28 },
+    { type: 'url',  url: 'assets/logos/Pep%26Co.png',        name: 'Pep & Co',        h: 28 },
+    { type: 'url',  url: 'assets/logos/M%26S.png',           name: 'M&S',             h: 38 },
+    { type: 'url',  url: 'assets/logos/F%26F.png',           name: 'F&F',             h: 38 },
+    { type: 'url',  url: 'assets/logos/John%20Lewis.png',    name: 'John Lewis',      h: 22 },
+    { type: 'url',  url: 'assets/logos/Optical%20Express.png', name: 'Optical Express', h: 20 },
+    { type: 'url',  url: 'assets/logos/Junior%20Eurovision.png', name: 'Junior Eurovision', h: 34 },
+    { type: 'url',  url: 'assets/logos/Tap%20Attack.png',    name: 'Tap Attack',      h: 32 },
+    { type: 'url',  url: 'assets/logos/Sophie%20Conran.png', name: 'Sophie Conran',   h: 20 },
+    { type: 'url',  url: 'assets/logos/Frankies%20Guys.png', name: "Frankie's Guys",  h: 22 },
+    { type: 'url',  url: 'assets/logos/Crowcon.png',         name: 'Crowcon',         h: 26 },
+    { type: 'url',  url: 'assets/logos/International%20Collective.png', name: 'International Collective', h: 22 },
+    { type: 'text', name: 'Ashley Banjo' },
+    { type: 'text', name: 'Louise Dearman' }
+  ];
+
+  // ─── Tunables ───────────────────────────────────────────────
+  var CFG = {
+    scrollToRadians: 0.0026,  // how much spin per pixel scrolled
+    idleDrift:       0.0011,  // constant slow rotation (radians/frame)
+    ease:            0.075,   // rotation inertia — lower = heavier
+    tilt:            -0.22,   // axis tilt in radians (the "middle axis" lean)
+    focal:           3.0,     // perspective depth, in sphere-radii
+    flatten:         0.46,    // vertical squash — 1 = true sphere, lower = tighter band
+    spread:          1.10,    // horizontal stretch — >1 widens the band
+    poleInset:       0.86,    // keeps logos off the poles, where orbit radius is 0
+    hitPad:          12,      // px of slop around each logo's hit box
+    hitPadHeld:      26,      // larger slop once held (stops hover flicker)
+    popDistance:     0.30,    // how far a held logo lifts toward the viewer (in radii)
+    popScale:        1.12,    // extra scale on a held logo
+    popEase:         0.12,    // how snappy the pop in/out is
+    backOpacity:     0.09,    // opacity of the furthest logos
+    frontOpacity:    0.92,    // opacity of the nearest logos
+    dimOthers:       0.55,    // opacity multiplier for non-held logos while holding
+    othersBlur:      0.9,     // px of extra blur on non-held logos while holding
+    maxBlur:         2.6      // px of blur on the back of the sphere
+  };
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var stage    = document.getElementById('stage');
+  var readout  = document.getElementById('readout-name');
+  var section  = document.querySelector('.sphere-section');
+
+  // ─── Build nodes + Fibonacci sphere distribution ────────────
+  var N = ITEMS.length;
+  var GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  var nodes = [];
+
+  for (var i = 0; i < N; i++) {
+    var item = ITEMS[i];
+
+    // Even point distribution over the sphere.
+    // The (i + 0.5)/N offset plus poleInset keeps points out of the polar caps —
+    // a logo sitting exactly on the axis has zero orbit radius and never moves.
+    var y = (1 - ((i + 0.5) / N) * 2) * CFG.poleInset;
+    var r = Math.sqrt(Math.max(0, 1 - y * y));
+    var theta = GOLDEN * i;
+
+    var el = document.createElement('div');
+    el.className = 'node';
+
+    if (item.type === 'text') {
+      var span = document.createElement('span');
+      span.textContent = item.name;
+      el.appendChild(span);
+    } else {
+      var img = document.createElement('img');
+      img.src = item.type === 'icon'
+        ? 'https://cdn.simpleicons.org/' + item.slug + '/ffffff'
+        : item.url;
+      img.alt = item.name;
+      img.loading = 'eager';
+      img.decoding = 'async';
+      img.style.height = (item.h || 30) + 'px';
+      // Flatten every logo to a single colour so the sphere reads as one object
+      img.style.filter = 'brightness(0) invert(1)';
+      img.onerror = (function (node, name) {
+        return function () {
+          node.innerHTML = '';
+          var s = document.createElement('span');
+          s.textContent = name;
+          node.appendChild(s);
+          measureNodes();
+        };
+      })(el, item.name);
+      img.onload = function () { measureNodes(); };
+      el.appendChild(img);
+    }
+
+    stage.appendChild(el);
+
+    nodes.push({
+      el: el,
+      // unit-sphere position
+      name: item.name,
+      bx: Math.cos(theta) * r,
+      by: y,
+      bz: Math.sin(theta) * r,
+      pop: 0,        // current pop amount 0→1
+      popTarget: 0,
+      hw: 40, hh: 16,   // half-size of the element, cached (see measureNodes)
+      sx: 0, sy: 0, sc: 1, depth: 0
+    });
+  }
+
+  // ─── Hover: manual hit-testing ──────────────────────────────
+  // Doing this by hand rather than with :hover / pointerenter avoids the
+  // flicker you get when a logo drifts out from under a stationary cursor,
+  // or when the pop-scale resizes the element under the pointer.
+  var held = null;
+  var pointer = null;   // {x, y} relative to the centre of the stage
+
+  function setHeld(n) {
+    if (held === n) return;
+    if (held) held.popTarget = 0;
+    held = n;
+    if (n) {
+      n.popTarget = 1;
+      readout.textContent = n.name;
+      readout.classList.add('on');
+    } else {
+      readout.classList.remove('on');
+    }
+  }
+
+  stage.addEventListener('pointermove', function (e) {
+    var rect = stage.getBoundingClientRect();
+    pointer = { x: e.clientX - rect.left - rect.width / 2,
+                y: e.clientY - rect.top - rect.height / 2 };
+  });
+  stage.addEventListener('pointerleave', function () { pointer = null; setHeld(null); });
+
+  function hitTest() {
+    if (!pointer) { setHeld(null); return; }
+    var best = null;
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (n.depth < 0.5 && n.pop < 0.1) continue;          // back half is untouchable
+      var pad = (n === held) ? CFG.hitPadHeld : CFG.hitPad; // hysteresis
+      if (Math.abs(pointer.x - n.sx) <= n.hw * n.sc + pad &&
+          Math.abs(pointer.y - n.sy) <= n.hh * n.sc + pad) {
+        if (!best || n.depth > best.depth) best = n;        // frontmost wins
+      }
+    }
+    setHeld(best);
+  }
+
+  function measureNodes() {
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (n.el.offsetWidth) { n.hw = n.el.offsetWidth / 2; n.hh = n.el.offsetHeight / 2; }
+    }
+  }
+
+  // ─── Rotation state ─────────────────────────────────────────
+  var rotTarget = 0;
+  var rotCurrent = 0;
+  var lastScroll = window.scrollY;
+
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    rotTarget += (y - lastScroll) * CFG.scrollToRadians;
+    lastScroll = y;
+  }, { passive: true });
+
+  // ─── Layout / sizing ────────────────────────────────────────
+  var W = 0, H = 0, R = 0, focal = 0;
+  function measure() {
+    var rect = stage.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    // Because the sphere is squashed vertically it can afford a bigger radius —
+    // width becomes the limiting dimension, not height.
+    R = Math.min(
+      (W * (W < 700 ? 0.26 : W < 1100 ? 0.30 : 0.36)) / CFG.spread,
+      (H * 0.34) / CFG.flatten
+    );
+    focal = R * CFG.focal;
+    measureNodes();
+  }
+  measure();
+  window.addEventListener('resize', measure);
+
+  // ─── Render loop ────────────────────────────────────────────
+  var sinTilt = Math.sin(CFG.tilt), cosTilt = Math.cos(CFG.tilt);
+
+  function frame() {
+    // Freeze the spin while a logo is held, otherwise drift + follow scroll
+    // While a logo is held the target is frozen, so the spin decelerates to a
+    // stop instead of stopping dead — and the logo stays put under the cursor.
+    if (!held && !reduceMotion) rotTarget += CFG.idleDrift;
+    rotCurrent += (rotTarget - rotCurrent) * CFG.ease;
+
+    var sinA = Math.sin(rotCurrent), cosA = Math.cos(rotCurrent);
+
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+
+      // spin about Y
+      var x1 =  n.bx * cosA + n.bz * sinA;
+      var y1 =  n.by;
+      var z1 = -n.bx * sinA + n.bz * cosA;
+
+      // tilt the axis
+      var x2 = x1;
+      var y2 = y1 * cosTilt - z1 * sinTilt;
+      var z2 = y1 * sinTilt + z1 * cosTilt;
+
+      // ease the pop
+      n.pop += (n.popTarget - n.pop) * CFG.popEase;
+      if (n.pop < 0.001) n.pop = 0;
+
+      var px = x2 * R * CFG.spread;    // horizontal stretch
+      var py = y2 * R * CFG.flatten;   // vertical-only squash → wide band, not a ball
+      var pz = z2 * R + n.pop * CFG.popDistance * R;
+
+      // perspective projection
+      var persp = focal / Math.max(focal - pz, focal * 0.18);
+      var sx = px * persp;
+      var sy = py * persp;
+
+      // depth 0 (back) → 1 (front), before pop
+      var t = (z2 + 1) / 2;
+      var depthOpacity = CFG.backOpacity + (CFG.frontOpacity - CFG.backOpacity) * Math.pow(t, 1.5);
+
+      // dim everything else while a logo is held
+      var opacity = depthOpacity;
+      if (held) {
+        opacity = n === held
+          ? Math.max(depthOpacity, 1)
+          : depthOpacity * CFG.dimOthers;
+      }
+      opacity += n.pop * (1 - opacity);
+
+      var scale = persp * (1 + n.pop * (CFG.popScale - 1));
+      var blur  = (1 - t) * CFG.maxBlur * (1 - n.pop);
+      // everything except the held logo softens a touch — quieter than dimming hard
+      if (held && n !== held) blur += CFG.othersBlur;
+
+      // cache for hit-testing
+      n.sx = sx; n.sy = sy; n.sc = scale; n.depth = t;
+
+      n.el.style.transform =
+        'translate3d(' + sx.toFixed(2) + 'px,' + sy.toFixed(2) + 'px,0) ' +
+        'translate(-50%,-50%) scale(' + scale.toFixed(3) + ')';
+      n.el.style.opacity = opacity.toFixed(3);
+      n.el.style.filter = blur > 0.06 ? 'blur(' + blur.toFixed(2) + 'px)' : 'none';
+      n.el.style.zIndex = String(Math.round((pz / R + 2) * 500));
+    }
+
+    hitTest();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // ─── Theme toggle (proves it works on both backgrounds) ─────
+  var toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', function () {
+    var light = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', light ? 'dark' : 'light');
+    toggle.textContent = light ? 'Light' : 'Dark';
+    var f = light ? 'brightness(0) invert(1)' : 'brightness(0)';
+    var imgs = stage.querySelectorAll('img');
+    for (var i = 0; i < imgs.length; i++) imgs[i].style.filter = f;
+  });
+})();
+</script>
+</body>
+</html>

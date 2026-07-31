@@ -13,3 +13,13 @@ Thumbs.db
 
 # Dependencies (if npm is ever added)
 node_modules/
+
+# Video masters — ProRes/alpha exports are hundreds of MB and exceed
+# GitHub's 100MB file limit. Keep them locally; ship the compressed .mp4s.
+*.mov
+*.mxf
+*.prores.mp4
+
+# Local backups
+*.backup-*
+*.bak
