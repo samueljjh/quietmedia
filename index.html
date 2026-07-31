@@ -179,8 +179,9 @@ html[data-theme="light"] .qm-sphere-node img { filter: brightness(0); }
   .qm-sphere-node span { font-size: 8px; letter-spacing: 0.1em; }
 }
 @media (max-width: 699px) {
-  .qm-sphere-section { --qm-frame: clamp(150px, 42vw, 300px); }
-  .qm-sphere-node img { max-width: 66px; }
+  /* Taller frame on phones — the shape goes upright rather than wide */
+  .qm-sphere-section { --qm-frame: clamp(200px, 70vw, 380px); }
+  .qm-sphere-node img { max-width: 64px; }
   .qm-sphere-node span { font-size: 7px; letter-spacing: 0.08em; }
   .qm-sphere-name { display: none; }
 }
@@ -885,6 +886,9 @@ const LOGO_SPHERE_CFG = {
   spread:          1.08,    // horizontal stretch
   poleInset:       0.86,    // keeps logos off the poles (orbit radius 0 there)
   yShift:          0.028,   // nudge up, as a fraction of frame height — sits near the top rule
+  // Phones have no width to spare, so the shape trades sideways for upright:
+  // nearly round, filling the screen edge to edge instead of being crushed flat.
+  mobile: { flatten: 0.86, spread: 1.00, yShift: 0.012 },
   hitPad:          12,      // px slop on the hit box
   hitPadHeld:      26,      // larger slop once held — kills hover flicker
   popDistance:     0.30,    // lift toward viewer, in radii
@@ -1069,14 +1073,16 @@ const LogoSphere = () => {
 
     // ── layout ──
     let W = 0, H = 0, R = 0, focal = 0;
+    let shape = CFG;          // swapped for CFG.mobile on narrow screens
     function measure() {
       const rect = stage.getBoundingClientRect();
       W = rect.width; H = rect.height;
+      shape = W < 700 ? CFG.mobile : CFG;
       // Width is the limiting dimension on desktop; the 0.42 vertical factor
       // leaves enough headroom for the upward yShift not to clip at the top.
       R = Math.min(
-        (W * (W < 700 ? 0.26 : W < 1100 ? 0.29 : W < 1400 ? 0.31 : 0.33)) / CFG.spread,
-        (H * 0.42) / CFG.flatten
+        (W * (W < 700 ? 0.36 : W < 1100 ? 0.29 : W < 1400 ? 0.31 : 0.33)) / shape.spread,
+        (H * 0.42) / shape.flatten
       );
       focal = R * CFG.focal;
       measureNodes();
@@ -1107,13 +1113,13 @@ const LogoSphere = () => {
           n.pop += (n.popTarget - n.pop) * CFG.popEase;
           if (n.pop < 0.001) n.pop = 0;
 
-          const px = x2 * R * CFG.spread;
-          const py = y2 * R * CFG.flatten;
+          const px = x2 * R * shape.spread;
+          const py = y2 * R * shape.flatten;
           const pz = z2 * R + n.pop * CFG.popDistance * R;
 
           const persp = focal / Math.max(focal - pz, focal * 0.18);
           const sx = px * persp;
-          const sy = py * persp - H * CFG.yShift;   // sit nearer the top rule
+          const sy = py * persp - H * shape.yShift;   // sit nearer the top rule
           const t = (z2 + 1) / 2;
 
           let opacity = CFG.backOpacity + (CFG.frontOpacity - CFG.backOpacity) * Math.pow(t, 1.5);
