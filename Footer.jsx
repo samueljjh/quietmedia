@@ -74,7 +74,7 @@ const QMFooter = ({ onNavigate }) => {
           <div style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: `rgba(var(--fg-rgb),0.22)`, marginBottom: '16px' }}>Follow</div>
           <div style={{ display: 'flex', gap: '10px' }}>
             <a href="https://www.instagram.com/quiet_media/" target="_blank" rel="noreferrer"
-              style={{ width: '34px', height: '34px', border: `1px solid rgba(var(--fg-rgb),0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.2s' }}
+              style={{ width: '34px', height: '34px', borderRadius: '50%', border: `1px solid rgba(var(--fg-rgb),0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = `rgba(var(--fg-rgb),0.35)`}
               onMouseLeave={e => e.currentTarget.style.borderColor = `rgba(var(--fg-rgb),0.12)`}
             >
@@ -83,7 +83,7 @@ const QMFooter = ({ onNavigate }) => {
               </svg>
             </a>
             <a href="https://www.facebook.com/quietmedia.co.uk" target="_blank" rel="noreferrer"
-              style={{ width: '34px', height: '34px', border: `1px solid rgba(var(--fg-rgb),0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.2s' }}
+              style={{ width: '34px', height: '34px', borderRadius: '50%', border: `1px solid rgba(var(--fg-rgb),0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = `rgba(var(--fg-rgb),0.35)`}
               onMouseLeave={e => e.currentTarget.style.borderColor = `rgba(var(--fg-rgb),0.12)`}
             >

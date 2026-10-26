@@ -116,7 +116,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
               fontSize: '10px', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase',
               color: onHeroDark ? '#0A0A0A' : 'var(--bg-primary)',
               background: onHeroDark ? '#ffffff' : 'var(--fg-primary)',
-              border: 'none', padding: '10px 22px', cursor: 'pointer', transition: 'opacity 0.2s ease',
+              border: 'none', borderRadius: 'var(--r-pill)', padding: '10px 22px', cursor: 'pointer', transition: 'opacity 0.2s ease',
             }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
@@ -166,7 +166,7 @@ const QMHeader = ({ currentPage, onNavigate, theme, onToggleTheme }) => {
             fontFamily: "'DM Sans', sans-serif",
             fontSize: '11px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase',
             color: 'var(--bg-primary)', background: 'var(--fg-primary)', border: 'none',
-            padding: '18px 32px', cursor: 'pointer', marginTop: '32px', alignSelf: 'flex-start',
+            borderRadius: 'var(--r-pill)', padding: '18px 32px', cursor: 'pointer', marginTop: '32px', alignSelf: 'flex-start',
           }}>BOOK AN INTRO CALL</button>
           <div style={{ marginTop: 'auto', paddingTop: '32px' }}>
             <div style={{ fontSize: '11px', color: `rgba(var(--fg-rgb),0.25)`, lineHeight: 1.8 }}>

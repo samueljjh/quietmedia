@@ -23,6 +23,12 @@
 
   --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Curves, shared with Quiet Studio: soft contained surfaces, sharp full-bleed page */
+  --r-xl:          22px;   /* cards, panels, modals, feature images */
+  --r:             14px;   /* images in strips, option tiles, smaller cards */
+  --r-s:           10px;   /* inputs, chips */
+  --r-pill:        999px;  /* buttons, toggles, icon buttons */
 }
 
 /* ─── Light mode ──────────────────────────────────────────── */

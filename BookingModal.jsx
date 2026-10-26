@@ -86,7 +86,7 @@ const BookingModal = ({ isOpen, onClose }) => {
     },
     modal: {
       background: 'var(--bg-secondary)',
-      border: '1px solid rgba(var(--fg-rgb),0.1)',
+      border: '1px solid rgba(var(--fg-rgb),0.1)', borderRadius: 'var(--r-xl)', overflow: 'hidden',
       width: '100%', maxWidth: '580px',
       maxHeight: '90vh',
       display: 'flex', flexDirection: 'column',
@@ -116,19 +116,19 @@ const BookingModal = ({ isOpen, onClose }) => {
       width: '100%', background: 'rgba(var(--fg-rgb),0.04)',
       border: '1px solid rgba(var(--fg-rgb),0.1)',
       color: 'var(--fg-primary)', fontFamily: "'DM Sans', sans-serif", fontSize: '14px', fontWeight: 300,
-      padding: '12px 14px', outline: 'none',
+      padding: '12px 14px', outline: 'none', borderRadius: 'var(--r-s)',
       transition: 'border-color 0.2s',
     },
     textarea: {
       width: '100%', background: 'rgba(var(--fg-rgb),0.04)',
       border: '1px solid rgba(var(--fg-rgb),0.1)',
       color: 'var(--fg-primary)', fontFamily: "'DM Sans', sans-serif", fontSize: '14px', fontWeight: 300,
-      padding: '12px 14px', outline: 'none', resize: 'vertical', minHeight: '80px',
+      padding: '12px 14px', outline: 'none', borderRadius: 'var(--r-s)', resize: 'vertical', minHeight: '80px',
     },
     btn: (active) => ({
       fontFamily: "'DM Sans', sans-serif", fontSize: '10px', fontWeight: 500,
       letterSpacing: '0.22em', textTransform: 'uppercase',
-      padding: '13px 28px', cursor: 'pointer',
+      padding: '13px 28px', cursor: 'pointer', borderRadius: 'var(--r-pill)',
       background: active ? 'var(--fg-primary)' : 'transparent',
       color: active ? 'var(--bg-primary)' : 'rgba(var(--fg-rgb),0.35)',
       border: active ? 'none' : '1px solid rgba(var(--fg-rgb),0.15)',
@@ -195,7 +195,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                   <button key={ct.id} onClick={() => set('callType', ct.id)} style={{
                     background: selected.callType === ct.id ? 'rgba(var(--fg-rgb),0.07)' : 'transparent',
                     border: `1px solid ${selected.callType === ct.id ? 'rgba(var(--fg-rgb),0.3)' : 'rgba(var(--fg-rgb),0.1)'}`,
-                    padding: '16px 18px', cursor: 'pointer', textAlign: 'left',
+                    padding: '16px 18px', cursor: 'pointer', textAlign: 'left', borderRadius: 'var(--r)',
                     transition: 'all 0.2s', fontFamily: "'DM Sans', sans-serif",
                   }}>
                     <div style={{ fontSize: '13px', fontWeight: 400, color: 'var(--fg-primary)', marginBottom: '4px' }}>{ct.label}</div>
@@ -215,7 +215,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                   const isSelected = selected.date && selected.date.toDateString() === d.toDateString();
                   return (
                     <button key={i} onClick={() => set('date', d)} style={{
-                      padding: '12px 8px', cursor: 'pointer', textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
+                      padding: '12px 8px', borderRadius: 'var(--r)', cursor: 'pointer', textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
                       background: isSelected ? 'rgba(var(--fg-rgb),0.09)' : 'transparent',
                       border: `1px solid ${isSelected ? 'rgba(var(--fg-rgb),0.35)' : 'rgba(var(--fg-rgb),0.1)'}`,
                       transition: 'all 0.2s',
@@ -239,7 +239,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                   const isSelected = selected.time === t;
                   return (
                     <button key={t} onClick={() => set('time', t)} style={{
-                      padding: '14px 8px', cursor: 'pointer', textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
+                      padding: '14px 8px', borderRadius: 'var(--r-pill)', cursor: 'pointer', textAlign: 'center', fontFamily: "'DM Sans', sans-serif",
                       background: isSelected ? 'rgba(var(--fg-rgb),0.09)' : 'transparent',
                       border: `1px solid ${isSelected ? 'rgba(var(--fg-rgb),0.35)' : 'rgba(var(--fg-rgb),0.1)'}`,
                       fontSize: '14px', fontWeight: 300, color: 'var(--fg-primary)',
