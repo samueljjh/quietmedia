@@ -669,7 +669,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '2px',
+            gap: '12px',
           }}
         >
           {pullQuotes.map((q, i) => (
@@ -678,8 +678,8 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
               className="reveal"
               style={{
                 background: 'var(--bg-secondary)',
+                borderRadius: 'var(--r-xl)',
                 padding: 'clamp(24px,3vw,36px)',
-                borderTop: '1px solid rgba(var(--fg-rgb),0.07)',
               }}
             >
               <p
@@ -855,6 +855,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
                 color: '#fff',
                 background: '#0A0A0A',
                 border: 'none',
+                borderRadius: 'var(--r-pill)',
                 padding: '16px 36px',
                 cursor: 'none',
                 transition: 'opacity 0.2s',
@@ -875,6 +876,7 @@ const CaseStudySoulPage = ({ onNavigate, onBook }) => {
                 color: 'rgba(10,10,10,0.6)',
                 background: 'transparent',
                 border: '1px solid rgba(10,10,10,0.25)',
+                borderRadius: 'var(--r-pill)',
                 padding: '16px 36px',
                 cursor: 'none',
                 transition: 'border-color 0.2s, color 0.2s',
@@ -935,8 +937,8 @@ const caseCTA = (onNavigate, onBook) => (
       <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: '20px' }}>START A CONVERSATION</p>
       <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 300, letterSpacing: '-0.8px', color: '#0A0A0A', lineHeight: 1.1, marginBottom: '32px' }}>Have a project in mind?</h2>
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>BOOK AN INTRO CALL</button>
-        <button onClick={() => onNavigate('case-studies')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '16px 36px', cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}>ALL CASE STUDIES</button>
+        <button onClick={onBook} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', borderRadius: 'var(--r-pill)', padding: '16px 36px', cursor: 'none', transition: 'opacity 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => (e.currentTarget.style.opacity = '0.8')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>BOOK AN INTRO CALL</button>
+        <button onClick={() => onNavigate('case-studies')} style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', borderRadius: 'var(--r-pill)', padding: '16px 36px', cursor: 'none', transition: 'border-color 0.2s, color 0.2s', fontFamily: "'DM Sans', sans-serif" }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}>ALL CASE STUDIES</button>
       </div>
     </div>
   </section>
@@ -1004,9 +1006,9 @@ const CaseStudyLTTLPage = ({ onNavigate, onBook }) => {
       <section style={{ padding: 'clamp(48px,6vw,80px) clamp(24px,5vw,80px)', borderBottom: '1px solid rgba(var(--fg-rgb),0.06)' }}>
         <div className="reveal">
           <p style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '24px' }}>DISTRIBUTION</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {['Paramount+', 'Amazon Prime', 'Sky Store', 'Apple TV', 'YouTube'].map((p, i) => (
-              <div key={i} style={{ padding: 'clamp(16px,2vw,22px) clamp(20px,2.5vw,36px)', background: 'var(--bg-secondary)', borderTop: '1px solid rgba(var(--fg-rgb),0.07)' }}>
+              <div key={i} style={{ padding: 'clamp(16px,2vw,22px) clamp(20px,2.5vw,36px)', background: 'var(--bg-secondary)', borderRadius: 'var(--r-pill)' }}>
                 <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.65)' }}>{p}</p>
               </div>
             ))}

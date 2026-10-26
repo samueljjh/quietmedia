@@ -31,7 +31,7 @@ Static site using **React 18 via CDN + Babel Standalone** for in-browser JSX tra
 
 **Page routing** is client-side via `React.useState` + `sessionStorage` — no URL changes. Pages: `home`, `work`, `about`, `team`.
 
-**Design system:** `colors_and_type.css` is the reference file for the design tokens (colors, typography scale, spacing). It is not imported by `index.html` — use it when adding new sections to stay on-brand.
+**Design system:** `colors_and_type.css` holds the design tokens (colors, typography scale, spacing, radii) and is loaded by `index.html`.
 
 **Brand assets:** `assets/` — logo variants (black/white), q_glyph.png, q_mark.svg. The `QMark` component is an inline SVG (not an image), so the assets are design references only.
 
@@ -39,7 +39,7 @@ Static site using **React 18 via CDN + Babel Standalone** for in-browser JSX tra
 
 - **Palette:** `#0A0A0A` near-black dominant; `#EDECE8` cream for the booking CTA section
 - **Typography:** DM Sans 300 (light) throughout; wordmark at 15px weight 300 letter-spacing `-0.01em`
-- **No border-radius** on structural elements — brand is minimal/sharp
+- **Curves follow Quiet Studio:** full-bleed sections, hero and page edges stay sharp; contained things are soft. Buttons are pills (`var(--r-pill)`), cards/panels/modals/feature images use `var(--r-xl)` (22px), strip stills and option tiles `var(--r)` (14px), inputs `var(--r-s)` (10px). Tokens live in `colors_and_type.css`. Cards sit 12px apart as separate surfaces rather than joined with hairlines.
 - **Film grain overlay** applied via `body::after` with an SVG filter at 3.5% opacity
 - **Scroll reveal** via `.reveal` / `.reveal.visible` CSS classes, wired by `IntersectionObserver` in `useReveal()`
 - Booking modal is **simulated** — `handleSubmit` shows a confirmation screen but sends nothing. Replace with Calendly/Cal.com embed when ready.

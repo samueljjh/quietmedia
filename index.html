@@ -695,7 +695,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
       }}>{lightboxIndex + 1} / {images.length}</div>
       <button onClick={prevImage} style={{
         position: 'absolute', left: '24px', top: '50%', transform: 'translateY(-50%)',
-        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
@@ -705,7 +705,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
       >←</button>
       <div onClick={e => e.stopPropagation()} style={{
         width: '100%', maxWidth: '1100px', aspectRatio: '2.39 / 1',
-        overflow: 'hidden', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
+        overflow: 'hidden', borderRadius: 'var(--r-xl)', boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
       }}>
         <img key={lightboxIndex} src={images[lightboxIndex]}
           alt={`${label} still ${lightboxIndex + 1}`}
@@ -714,7 +714,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
       </div>
       <button onClick={nextImage} style={{
         position: 'absolute', right: '24px', top: '50%', transform: 'translateY(-50%)',
-        background: 'none', border: '1px solid rgba(255,255,255,0.2)',
+        background: 'none', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%',
         color: 'rgba(255,255,255,0.6)', width: '44px', height: '44px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s', fontSize: '16px',
@@ -755,7 +755,7 @@ const FilmStrip = ({ images, id, direction = 'left', speed = 1.4, label = 'quiet
             <div key={i} onClick={() => openLightbox(i % images.length)} data-cursor="view" role="button" aria-label={`View still ${(i % images.length) + 1}`}
               style={{
                 flexShrink: 0, width: 'clamp(320px, 38vw, 560px)',
-                aspectRatio: '2.39 / 1', overflow: 'hidden',
+                aspectRatio: '2.39 / 1', overflow: 'hidden', borderRadius: 'var(--r)',
                 position: 'relative', cursor: 'inherit',
               }}
               onMouseEnter={e => {
@@ -843,11 +843,11 @@ const HeroSection = ({ onBook }) => {
             Boutique film production. Human stories, told with craft and quiet precision.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+            <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#0A0A0A', background: '#ffffff', border: 'none', borderRadius: 'var(--r-pill)', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
               onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
               onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >BOOK AN INTRO CALL</button>
-            <button onClick={openLightbox} data-cursor="play" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', padding: '16px 36px', cursor: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
+            <button onClick={openLightbox} data-cursor="play" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', background: 'transparent', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 'var(--r-pill)', padding: '16px 36px', cursor: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', transition: 'border-color 0.2s, color 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'; e.currentTarget.style.color = '#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
             >
@@ -860,7 +860,7 @@ const HeroSection = ({ onBook }) => {
       {lightboxOpen && (
         <div onClick={closeLightbox} style={{ position: 'fixed', inset: 0, zIndex: 999, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
           <button onClick={closeLightbox} style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#fff', fontSize: '28px', cursor: 'inherit', opacity: 0.6, lineHeight: 1 }}>✕</button>
-          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '1000px', aspectRatio: '16/9', position: 'relative' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '1000px', aspectRatio: '16/9', position: 'relative', borderRadius: 'var(--r-xl)', overflow: 'hidden' }}>
             <iframe src="https://player.vimeo.com/video/761499977?h=861ebbfc0a&autoplay=1&title=0&byline=0&portrait=0"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
               allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
@@ -1354,9 +1354,9 @@ const ServicesSection = () => {
           Film production for those<br />who care about quality.
         </h2>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
         {services.map((s, i) => (
-          <div key={i} className="reveal" style={{ background: 'var(--bg-secondary)', padding: 'clamp(28px,4vw,44px)', borderTop: '1px solid rgba(var(--fg-rgb),0.08)', display: 'flex', flexDirection: 'column' }}>
+          <div key={i} className="reveal" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--r-xl)', padding: 'clamp(28px,4vw,44px)', display: 'flex', flexDirection: 'column' }}>
             <p style={{ fontSize: '9px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.28)', marginBottom: '18px' }}>{s.label}</p>
             <h3 style={{ fontSize: 'clamp(18px,2vw,22px)', fontWeight: 300, color: 'var(--fg-primary)', letterSpacing: '-0.01em', lineHeight: 1.25, marginBottom: '24px', textWrap: 'pretty' }}>{s.title}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
@@ -1575,11 +1575,11 @@ const BookingCTASection = ({ onBook }) => {
           A 30-minute introductory call to understand your vision, answer questions, and explore how we can work together. No pressure, no obligation.
         </p>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '18px 40px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', borderRadius: 'var(--r-pill)', padding: '18px 40px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
-          <a href="mailto:tamy@quietmedia.co.uk" data-cursor="email" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', padding: '18px 40px', cursor: 'inherit', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
+          <a href="mailto:tamy@quietmedia.co.uk" data-cursor="email" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.6)', background: 'transparent', border: '1px solid rgba(10,10,10,0.25)', borderRadius: 'var(--r-pill)', padding: '18px 40px', cursor: 'inherit', textDecoration: 'none', display: 'inline-block', transition: 'border-color 0.2s, color 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.55)'; e.currentTarget.style.color = '#0A0A0A'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(10,10,10,0.25)'; e.currentTarget.style.color = 'rgba(10,10,10,0.6)'; }}
           >SEND AN EMAIL</a>
@@ -1594,9 +1594,9 @@ const TeamPreviewSection = ({ onNavigate }) => {
   useReveal();
   return (
     <section className="two-col-grid" style={{ padding: 'clamp(80px,10vw,140px) clamp(24px,5vw,80px)', borderTop: '1px solid rgba(var(--fg-rgb),0.06)' }}>
-      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+      <div className="reveal" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         {[{ name: 'Samuel', src: 'assets/samuel.jpg' }, { name: 'Tamy', src: 'assets/tamy.jpg' }].map((person) => (
-          <div key={person.name} style={{ aspectRatio: '3/4', overflow: 'hidden' }}>
+          <div key={person.name} style={{ aspectRatio: '3/4', overflow: 'hidden', borderRadius: 'var(--r-xl)' }}>
             <img src={person.src} alt={person.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           </div>
         ))}
@@ -1609,7 +1609,7 @@ const TeamPreviewSection = ({ onNavigate }) => {
         <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(var(--fg-rgb),0.42)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
           Two filmmakers who share a commitment to craft, collaboration, and telling stories that matter. Every project we take on, we treat as our own.
         </p>
-        <button onClick={() => onNavigate('team')} data-cursor="meet" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', padding: '14px 28px', cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s' }}
+        <button onClick={() => onNavigate('team')} data-cursor="meet" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(var(--fg-rgb),0.55)', background: 'transparent', border: '1px solid rgba(var(--fg-rgb),0.18)', borderRadius: 'var(--r-pill)', padding: '14px 28px', cursor: 'inherit', transition: 'border-color 0.2s, color 0.2s' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.45)'; e.currentTarget.style.color = 'var(--fg-primary)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(var(--fg-rgb),0.18)'; e.currentTarget.style.color = 'rgba(var(--fg-rgb),0.55)'; }}
         >MEET THE TEAM</button>
@@ -1655,7 +1655,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
       <section style={{ padding: 'clamp(64px,8vw,120px) clamp(24px,5vw,80px)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
         {members.map((m, i) => (
           <div key={m.name} className="reveal two-col-grid" style={{ alignItems: 'start', padding: 'clamp(40px,5vw,64px) 0', borderBottom: i < members.length - 1 ? '1px solid rgba(var(--fg-rgb),0.06)' : 'none' }}>
-            <div style={{ aspectRatio: '4/5', overflow: 'hidden', order: i % 2 === 1 ? 1 : 0 }}>
+            <div style={{ aspectRatio: '4/5', overflow: 'hidden', borderRadius: 'var(--r-xl)', order: i % 2 === 1 ? 1 : 0 }}>
               <img src={m.src} alt={m.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
             </div>
             <div style={{ order: i % 2 === 1 ? 0 : 1, paddingTop: '8px' }}>
@@ -1674,7 +1674,7 @@ const TeamPage = ({ onNavigate, onBook }) => {
           <p style={{ fontSize: '15px', fontWeight: 300, color: 'rgba(10,10,10,0.45)', lineHeight: 1.8, marginBottom: '32px', textWrap: 'pretty' }}>
             Book a free 30-minute intro call. We'll talk about your project and see if we're the right fit.
           </p>
-          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
+          <button onClick={onBook} data-cursor="book" data-magnetic style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.24em', textTransform: 'uppercase', color: '#fff', background: '#0A0A0A', border: 'none', borderRadius: 'var(--r-pill)', padding: '16px 36px', cursor: 'inherit', transition: 'opacity 0.2s' }}
             onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >BOOK AN INTRO CALL</button>
